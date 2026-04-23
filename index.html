@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🍓 지우 포카 🍓</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #007bff;
+            --secondary: #ff4757;
+            --bg: #f8f9fa;
+            --card-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            --border: #edf2f7;
+            --grid-cols: 2; /* 기본 2열 설정 */
+        }
+
+        /* [수정] 전체 리셋 및 모바일 확대 방지 */
+        * { 
+            margin: 0; padding: 0; box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
+        }
+        
+        html, body { 
+            font-family: 'Noto Sans KR', sans-serif; 
+            background-color: var(--bg); 
+            color: #2d3436; 
+            line-height: 1.6;
+            /* 모바일 확대 방지 핵심 */
+            touch-action: pan-x pan-y;
+            -webkit-text-size-adjust: none;
+            overflow-x: hidden;
+        }
+
+        /* [수정] 입력창 클릭 시 화면 커짐 방지 (폰트 16px) */
+        input[type="text"] { font-size: 16px !important; }
+
+        .container { max-width: 500px; margin: 0 auto; min-height: 100vh; background-color: #fff; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.05); }
+        
+        .header { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 12px 20px; background-color: #fff; border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; z-index: 1000;
+        }
+        .logo { font-size: 20px; font-weight: 700; color: #1e272e; cursor: pointer; user-select: none; letter-spacing: -0.5px; }
+        .icon-btn { background: none; border: none; cursor: pointer; color: #485460; font-size: 1.2rem; padding: 8px; transition: color 0.2s; }
+        
+        .toc-menu { 
+            display: none; background-color: #fff; padding: 15px 20px; 
+            position: absolute; top: 57px; left: 0; width: 100%; 
+            height: calc(100vh - 57px); z-index: 2000; overflow-y: auto;
+        }
+        .menu-group { border-bottom: 1px solid var(--border); padding: 5px 0; }
+        .menu-parent-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; }
+        .menu-parent-text { font-size: 1.05rem; font-weight: 700; color: #2d3436; cursor: pointer; flex: 1; }
+        .toggle-btn { padding: 10px; cursor: pointer; color: #b2bec3; transition: 0.3s; }
+        .toggle-btn.active { transform: rotate(180deg); color: var(--primary); }
+        .menu-child-list { list-style: none; padding: 5px 0 15px 5px; display: none; flex-wrap: wrap; gap: 8px; }
+        .menu-child-item { font-size: 0.8rem; color: #636e72; cursor: pointer; background: #f1f2f6; padding: 6px 14px; border-radius: 20px; transition: 0.2s; }
+
+        .main-content { padding: 20px; min-height: 80vh; }
+        
+        .welcome { text-align: center; margin-top: 80px; animation: fadeIn 0.8s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .welcome p { color: #a4b0be; font-size: 0.95rem; }
+        .bookmark-main-btn { 
+            margin-top: 25px; padding: 12px 30px; border: none; 
+            background: var(--secondary); color: #fff; border-radius: 50px; 
+            font-weight: 700; cursor: pointer; box-shadow: 0 4px 15px rgba(255, 71, 87, 0.3);
+            transition: 0.2s; font-size: 0.9rem;
+        }
+
+        .search-bar-container { display: none; margin-bottom: 20px; animation: fadeIn 0.4s; }
+        .search-input-wrapper { position: relative; display: flex; align-items: center; }
+        .search-input-wrapper i { position: absolute; left: 15px; color: #a4b0be; font-size: 0.9rem; }
+        .search-input-wrapper input { 
+            width: 100%; padding: 12px 12px 12px 40px; border: 1px solid var(--border); 
+            border-radius: 12px; outline: none; background: #f9f9f9; 
+        }
+
+        #result-area { display: none; animation: fadeIn 0.4s; }
+        .album-title { font-size: 1.4rem; font-weight: 700; color: var(--primary); margin-bottom: 15px; letter-spacing: -0.5px; }
+        .tab-container { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+        .tab-btn { 
+            padding: 7px 14px; border: 1px solid var(--border); background: #fff; 
+            border-radius: 8px; cursor: pointer; font-size: 0.75rem; font-weight: 500; color: #7f8c8d;
+        }
+        .tab-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3); }
+        
+        .sub-filter-group { background: #f9f9f9; padding: 12px; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--border); }
+        .filter-label { font-size: 0.75rem; color: #a4b0be; margin-bottom: 8px; font-weight: 700; }
+        .filter-btns { display: flex; flex-wrap: wrap; gap: 6px; }
+        .f-btn { flex: 1; min-width: 80px; padding: 7px; border-radius: 6px; border: 1px solid #ddd; background: #fff; font-size: 0.7rem; cursor: pointer; color: #636e72; }
+        .f-btn.active { background: #2d3436; color: #fff; border-color: #2d3436; }
+
+        /* [수정] 슬라이더 및 카운트 레이아웃 (오른쪽 끝 배치) */
+        .info-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        #tab-label { font-size: 0.85rem; font-weight: 700; color: #b2bec3; margin-bottom: 0; }
+        
+        #grid-slider-container { 
+            display: none; align-items: center; gap: 8px; 
+            margin-left: auto; /* 오른쪽 끝으로 밀기 */
+        }
+        .zoom-slider { 
+            -webkit-appearance: none; width: 80px; height: 4px; 
+            background: #dfe6e9; border-radius: 2px; outline: none;
+        }
+        .zoom-slider::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 14px; height: 14px; 
+            background: var(--primary); border-radius: 50%; cursor: pointer;
+        }
+
+        /* [수정] 동적 가로 배열 시스템 */
+        .card-grid { 
+            display: grid; 
+            grid-template-columns: repeat(var(--grid-cols), 1fr); 
+            gap: calc(20px / var(--grid-cols)); 
+            margin-top: 10px; 
+        }
+
+        .card-item { 
+            background: #fff; border-radius: 12px; border: 1px solid var(--border); 
+            padding: 8px; display: flex; flex-direction: column; position: relative; 
+            box-shadow: var(--card-shadow);
+        }
+        
+        .card-image-wrapper { 
+            width: 100%; aspect-ratio: 5.5 / 8.5; border-radius: 8px; overflow: hidden; 
+            background: #f1f2f6; position: relative;
+        }
+        .card-image-wrapper img { width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
+        
+        .card-name { font-size: 0.85rem; font-weight: 700; color: #2d3436; margin: 10px 0 4px; text-align: center; }
+        
+        /* 3열 이상(축소 시) 스타일 자동 조정 */
+        .grid-3-plus .card-name { font-size: 0.7rem; margin: 6px 0 2px; line-height: 1.2; }
+        .grid-3-plus .card-item { padding: 5px; border-radius: 8px; }
+        .grid-3-plus .card-bookmark-btn { width: 24px; height: 24px; font-size: 0.8rem; top: 8px; right: 8px; }
+
+        .card-bookmark-btn { 
+            position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.8); 
+            border: none; cursor: pointer; font-size: 1.1rem; color: #dfe6e9; 
+            z-index: 5; width: 32px; height: 32px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px);
+        }
+        .card-bookmark-btn.active { color: var(--secondary); background: #fff; }
+
+        .modal {
+            display: none; position: fixed; z-index: 3000; top: 0; left: 0;
+            width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.9);
+            justify-content: center; align-items: center; cursor: zoom-out;
+        }
+        .modal-content {
+            max-width: 90%; max-height: 80%; border-radius: 15px;
+            animation: zoomIn 0.3s;
+        }
+        @keyframes zoomIn { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.welcome-char {
+    display: block;
+    margin: 0 auto 0px; /* 가운데 정렬 및 아래 간격 */
+    height: 155px;       /* 100~150 사이로 원하는 크기를 조절해 보세요 */
+    width: auto;
+}
+/* 헤더 전체 구조 설정 */
+.header {
+    display: flex;
+    justify-content: space-between; /* 양끝으로 버튼 배치 */
+    align-items: center;
+    padding: 12px 20px;
+    height: 57px; /* 높이를 고정해서 들썩임 방지 */
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background-color: #fff;
+}
+
+/* 로고를 부모(헤더) 기준 정중앙에 절대 좌표로 박아버림 */
+.logo {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%); /* 정확히 중앙으로 이동 */
+    margin: 0 !important;
+    white-space: nowrap;
+    pointer-events: auto; /* 클릭은 가능하게 유지 */
+    z-index: 1100;
+}
+
+/* 버튼들은 로고와 상관없이 제 자리에 있게 함 */
+.icon-btn {
+    position: relative;
+    z-index: 1200; /* 버튼이 로고보다 위에 오게 해서 클릭 방해 방지 */
+    min-width: 40px; /* 버튼 자리를 미리 확보 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+/* 1. 스크롤바 공간을 강제로 고정해서 화면 밀림 방지 */
+html {
+    overflow-y: scroll; 
+}
+
+/* 2. 메뉴 열릴 때 바디 고정 */
+body {
+    -webkit-text-size-adjust: none;
+    touch-action: pan-x pan-y;
+    width: 100%;
+}
+
+/* 3. 메뉴 레이아웃 위치 미세 조정 */
+.toc-menu {
+    position: fixed; /* absolute 대신 fixed로 변경하여 화면에 고정 */
+    top: 57px;
+    left: 50%; /* 가운데 정렬 유지 */
+    transform: translateX(-50%);
+    max-width: 500px; /* 컨테이너 너비와 동일하게 */
+    width: 100%;
+    height: calc(100vh - 57px);
+    z-index: 2000;
+    overflow-y: auto;
+    background-color: #fff;
+}
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header class="header">
+        <button id="menu-toggle" class="icon-btn"><i class="fas fa-bars"></i></button>
+        <h1 class="logo" onclick="goHome()">🍓 지우 포카 🍓</h1>
+        <button id="search-toggle" class="icon-btn"><i class="fas fa-search"></i></button>
+    </header>
+
+    <nav id="toc-menu" class="toc-menu">
+        <div id="menu-list-container"></div>
+    </nav>
+
+    <main class="main-content" id="main-view">
+        <div id="search-bar" class="search-bar-container">
+            <div class="search-input-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" id="search-input" placeholder="이름 또는 특징(안경, 볼콕 등) 검색...">
+            </div>
+        </div>
+
+        <div id="welcome-view" class="welcome">
+<p>메뉴를 선택해 포토카드를 확인하세요</p>
+            <button class="bookmark-main-btn" onclick="showBookmarks()">
+                <i class="fas fa-heart"></i> 내 북마크 보기
+            </button>
+        </div>
+
+        <div id="result-area">
+            <h2 id="display-album-name" class="album-title">Album Name</h2>
+            <div id="tab-wrapper" class="tab-container"></div>
+            
+            <div id="version-filter" class="sub-filter-group" style="display:none;">
+                <p class="filter-label">VERSION</p>
+                <div id="version-btn-wrapper" class="filter-btns"></div>
+            </div>
+
+            <div id="fansign-filter" class="sub-filter-group" style="display:none;">
+                <p class="filter-label">FANSIGN TYPE</p>
+                <div id="fansign-btn-wrapper" class="filter-btns"></div>
+            </div>
+
+           <div class="info-row">
+    <div id="tab-label">[전체] 목록</div>
+    <div id="grid-slider-container">
+        <i class="fas fa-minus" style="font-size: 0.7rem; color: #b2bec3;"></i>
+        <input type="range" id="grid-range" class="zoom-slider" min="2" max="4" value="2" step="1">
+        <i class="fas fa-plus" style="font-size: 0.7rem; color: #b2bec3;"></i>
+    </div>
+</div>
+<div class="card-grid" id="pc-list"></div>
+        </div>
+    </main>
+</div>
+
+<div id="image-modal" class="modal" onclick="closeModal()">
+    <img id="modal-img" class="modal-content">
+</div>
+</style>
+
+<script>
+    const pcData = [
+       { id: '1', name: 'The Chase 지우 Photobook Ver.', album: 'The Chase', category: '앨범 포카', version: 'Photobook Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/photobook%20vers..jpg', info: '더체이스, 핑크색 배경, 네일, 깐머리, 노란색 옷' },
+       { id: '2', name: 'The Chase 지우 Minibook Ver.', album: 'The Chase', category: '앨범 포카', version: 'Minibook Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/minibookver.jpg', info: '더체이스, 브이, 깐머리' },
+ { id: '3', name: 'The Chase 지우 Package Ver.', album: 'The Chase', category: '앨범 포카', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/package%20ver..jpg', info: '더체이스, 앞머리, 초록색 옷' },
+ { id: '4', name: 'The Chase 지우 메이크스타', album: 'The Chase', category: '예판 특전', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%A9%94%EC%9D%B4%ED%81%AC%20%EC%8A%A4%ED%83%80%20%EC%98%88%ED%8C%90%ED%8A%B9%EC%A0%84.jpg', info: '더체이스, 깐머리, 꽃받침, 윙크, 메이크스타' },
+ { id: '5', name: 'The Chase 지우 위드뮤', album: 'The Chase', category: '예판 특전', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EC%9C%84%EB%93%9C%EB%AE%A4%20%EB%8D%94%EC%B2%B4%EC%9D%B4%EC%8A%A4.jpg', info: '더체이스, 아궁빵, 깐머리, 위드뮤, 아잉' },
+{ id: '6', name: 'The Chase 지우 에셈타운', album: 'The Chase', category: '예판 특전', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%97%90%EC%85%88%ED%83%80%EC%9A%B4.jpg', info: '더체이스, smtown, 깐머리, 에스엠, 뽀글이옷' },
+{ id: '7', name: 'The Chase 지우 케이타운포유', album: 'The Chase', category: '예판 특전', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%BC%80%ED%83%80%ED%8F%AC%EC%98%88%ED%8C%90.jpg', info: '더체이스, ktown4u, 깐머리, 케타포, 꽃받침' },
+{ id: '8', name: 'The Chase 지우 디어마이뮤즈', album: 'The Chase', category: '예판 특전', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EB%94%94%EB%A7%88%EB%AE%A4%20%EC%98%88%ED%8C%90.JPG', info: '더체이스, 디마뮤, 거울셀카, dearmymuse, 꽃받침' },
+{ id: '9', name: 'The Chase 지우 이즈위 1.0', album: 'The Chase', category: '예판 특전', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%9D%B4%EC%A6%88%EC%9C%84%201.0.jpg', info: '더체이스, 이즈위, 브이, yzy, 깐머리' },
+{ id: '10', name: 'The Chase 지우 이즈위 2.0', album: 'The Chase', category: '예판 특전', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%9D%B4%EC%A6%88%EC%9C%84%202.0.jpg', info: '더체이스, 이즈위, 얼굴자랑, yzy, 깐머리, 턱받침, 꽃받침' },
+{ id: '11', name: 'The Chase 지우 이즈위 3.0', album: 'The Chase', category: '예판 특전', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%9D%B4%EC%A6%88%EC%9C%84%203.0.png', info: '더체이스, 이즈위, 턱받침, 꽃받침, yzy, 깐머리' },
+{ id: '12', name: 'The Chase 지우 이즈위 4.0', album: 'The Chase', category: '예판 특전', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%9D%B4%EC%A6%88%EC%9C%84%204.0.png', info: '더체이스, 이즈위, 고양이귀, yzy, 깐머리' },
+{ id: '13', name: 'The Chase 지우 이즈위 5.0', album: 'The Chase', category: '예판 특전', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%9D%B4%EC%A6%88%EC%9C%84%205.0.jpg', info: '더체이스, 이즈위, 턱받침, 꽃받침, yzy, 깐머리, 핀' },
+{ id: '14', name: 'The Chase 지우 위버스', album: 'The Chase', category: '예판 특전', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%9C%84%EB%B2%84%EC%8A%A4.jpg', info: '더체이스, 위버스, weverse, 고양이귀, 깐머리' },
+{ id: '15', name: 'The Chase 지우 사운드웨이브', album: 'The Chase', category: '예판 특전', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%82%AC%EC%9A%B4%EB%93%9C%20%EC%9B%A8%EC%9D%B4%EB%B8%8C.jpg', info: '더체이스, soundwave, 얼빡, 앞머리' },
+{ id: '16', name: 'The Chase 지우 애플뮤직', album: 'The Chase', category: '예판 특전', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%95%A0%ED%94%8C%EB%AE%A4%EC%A7%81.jpg', info: '더체이스, applemusic, 볼하트, 깐머리' },
+{ id: '17', name: 'The Chase 지우 스타리버', album: 'The Chase', category: '예판 특전', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%8A%A4%ED%83%80%EB%A6%AC%EB%B2%84.jpg', info: '더체이스, starriver, 깐머리' },
+{ id: '18', name: 'The Chase 지우 스타리버 폴라', album: 'The Chase', category: '예판 특전', version: 'Package Ver.', imgUrl: '', info: '더체이스, 이즈위, 턱 받침, 꽃 받침, yzy, 깐머리, 핀, 폴라포카' },
+{ id: '19', name: 'The Chase 지우 케이엠스테이션 1.0', album: 'The Chase', category: '예판 특전', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20kmstation.jpg', info: '더체이스, kmstation, 브이, 윙크, 깐머리' },
+{ id: '20', name: 'The Chase 지우 케이엠스테이션 2.0', album: 'The Chase', category: '예판 특전', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20kmstation%202.jpg', info: '더체이스, kmstation, 턱받침, 꽃받침, 깐머리, 이쁜척' },
+{ id: '21', name: 'The Chase 지우 케이엠스테이션 3.0', album: 'The Chase', category: '예판 특전', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20kmstation3.jpg', info: '더체이스, kmstation, 고양이귀, 깐머리' },
+{ id: '22', name: 'The Chase 지우 케이엠스테이션 4.0', album: 'The Chase', category: '예판 특전', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20kmstation4.jpg', info: '더체이스, kmstation, 윙크, 앞머리, 브이' },
+{ id: '23', name: 'The Chase 지우 케이엠스테이션 폴라', album: 'The Chase', category: '예판 특전', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20kmatation%20%ED%8F%B4%EB%9D%BC%20%ED%8F%AC%EC%B9%B4.jpg', info: '더체이스, kmstation, 턱받침, 폴라포카' },
+{ id: '24', name: 'The Chase 지우 예스24', album: 'The Chase', category: '예판 특전', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%98%88%EC%82%AC.jpg', info: '더체이스, yes24, 앞머리, 앙' },
+{ id: '25', name: 'The Chase 지우 카카오톡', album: 'The Chase', category: '예판 특전', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%B9%B4%EC%B9%B4%EC%98%A4%ED%86%A1.jpg', info: '더체이스, kakaotalk, 윙크, 브이, 깐머리' },
+{ id: '26', name: 'The Chase 지우 위드뮤 ', album: 'The Chase', category: '럭키드로우', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%9C%84%EB%93%9C%EB%AE%A4%20%EB%9F%AD%EB%93%9C.png', info: '더체이스, withmuu, 깐머리' },
+{ id: '27', name: 'The Chase 지우 디어마이뮤즈', album: 'The Chase', category: '럭키드로우', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EB%94%94%EB%A7%88%EB%AE%A4%20%EB%9F%AD%EB%93%9C.jpg', info: '더체이스, dearmymuse, 깐머리, 귀' },
+{ id: '28', name: 'The Chase 지우 사운드웨이브', album: 'The Chase', category: '럭키드로우', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%82%AC%EC%9B%A8%20%EB%9F%AD%EB%93%9C.jpg', info: '더체이스, soundwave, 볼하트, 윙크, 깐머리' },
+{ id: '29', name: 'The Chase 지우 메이크스타', album: 'The Chase', category: '럭키드로우', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EB%A9%94%EC%9D%B4%ED%81%AC%EC%8A%A4%ED%83%80%20%EB%9F%AD%EB%93%9C.jpg', info: '더체이스, makestat, 브이, 광각샷, 깐머리' },   
+{ id: '30', name: 'The Chase 지우 뮤직아트', album: 'The Chase', category: '럭키드로우', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EB%AE%A4%EC%A7%81%EC%95%84%ED%8A%B8%20%EB%9F%AD%EB%93%9C.jpg', info: '더체이스, musicart, 브이, 깐머리, 얼빡' },
+{ id: '31', name: 'The Chase 지우 애플뮤직', album: 'The Chase', category: '럭키드로우', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%95%A0%ED%94%8C%EB%AE%A4%EC%A7%81%20%EB%9F%AD%EB%93%9C.jpg', info: '더체이스, applemusic, 윙크, 깐머리' },
+{ id: '32', name: 'The Chase 지우 케이타운포유', album: 'The Chase', category: '럭키드로우', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%BC%80%ED%83%80%ED%8F%AC%20%EB%9F%AD%EB%93%9C.webp', info: '더체이스, ktown4u, 깐머리, 곰인형, 얼빡' },
+{ id: '33', name: 'The Chase 지우 에셈타운', album: 'The Chase', category: '럭키드로우', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%97%90%EC%85%88%ED%83%80%EC%9A%B4%20%EB%9F%AD%EB%93%9C.jpg', info: '더체이스, smtown, 깐머리, 윙크, 화이팅' },
+{ id: '34', name: 'The Chase 지우 이즈위 ', album: 'The Chase', category: '럭키드로우', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%9D%B4%EC%A6%88%EC%9C%84%20%EB%9F%AD%EB%93%9C.png', info: '더체이스, Iszue, 깐머리' },
+{ id: '35', name: 'The Chase 지우 케이팝머치', album: 'The Chase', category: '럭키드로우', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%BC%80%EC%9D%B4%ED%8C%9D%EB%A8%B8%EC%B9%98%20%EB%9F%AD%EB%93%9C.jpg', info: '더체이스, kpopmerch, 깐머리' },
+{ id: '36', name: 'The Chase 지우 케이엠스테이션 1.0', album: 'The Chase', category: '럭키드로우', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%BC%80%EC%9D%B4%EC%97%A0%EC%8A%A4%ED%85%8C%EC%9D%B4%EC%85%98%20%EB%9F%AD%EB%93%9C.jpg', info: '더체이스, kmstation, 깐머리, 주먹' },
+{ id: '37', name: 'The Chase 지우 케이엠스테이션 2.0', album: 'The Chase', category: '럭키드로우', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20kmstation%20%EB%9F%AD%EB%93%9C2.jpg', info: '더체이스, kmstation, 깐머리, 고양이귀, 윙크' },
+{ id: '38', name: 'The Chase 지우 에셈타운', album: 'The Chase', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%97%90%EC%85%88%20%EB%8C%80%EB%A9%B4.jpg', info: '더체이스, 대면팬싸, smtown, 깐머리, 주먹, 반지' },
+{ id: '39', name: 'The Chase 지우 애플뮤직', album: 'The Chase', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%95%A0%ED%94%8C%EB%AE%A4%EC%A7%81%20%EB%8C%80%EB%A9%B4.jpg', info: '더체이스, 대면팬싸, applemusic, 윙크, 깐머리, 턱받침' },
+{ id: '40', name: 'The Chase 지우 케이타운포유', album: 'The Chase', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%BC%80%ED%83%80%ED%8F%AC%20%EB%8C%80%EB%A9%B4.jpg', info: '더체이스, 대면팬싸, ktown4u, 깐머리, 브이, 거울샷' },
+{ id: '41', name: 'The Chase 지우 디어마이뮤즈', album: 'The Chase', category: '팬싸 특전', fsType: '영통', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EB%94%94%EB%A7%88%EB%AE%A4%20%EC%98%81%ED%86%B5.jpg', info: '더체이스, 영통팬싸, dearmymuse, 깐머리' },
+{ id: '42', name: 'The Chase 지우 위드뮤', album: 'The Chase', category: '팬싸 특전', fsType: '영통', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%9C%84%EB%93%9C%EB%AE%A4%20%EB%8C%80%EB%A9%B4.jpg', info: '더체이스, 영통팬싸, withmuu, 깐머리, 윙크' },
+{ id: '43', name: 'The Chase 지우 뮤직아트 1.0', album: 'The Chase', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EB%AE%A4%EC%A7%81%EC%B9%B4%ED%8A%B8%20%EB%8C%80%EB%A9%B4.jpg', info: '더체이스, 대면팬싸, musicart, 깐머리, 반지' },
+{ id: '44', name: 'The Chase 지우 사운드웨이브', album: 'The Chase', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%82%AC%EC%9B%A8%20%EB%8C%80%EB%A9%B4.jpg', info: '더체이스, 대면팬싸, soundwave, 깐머리, 주먹, 반지' },
+{ id: '45', name: 'The Chase 지우 스타리버 1.0 ', album: 'The Chase', category: '팬싸 특전', fsType: '영통', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%8A%A4%ED%83%80%EB%A6%AC%EB%B2%84%20%EC%98%81%ED%86%B51.jpg', info: '더체이스, 영통팬싸, starriver, 깐머리, 브이, 꼼데가르송' },
+{ id: '46', name: 'The Chase 지우 스타리버 폴라 1.0 ', album: 'The Chase', category: '팬싸 특전', fsType: '영통', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%8A%A4%ED%83%80%EB%A6%AC%EB%B2%84%20%EC%98%81%ED%86%B5%20%ED%8F%B4%EB%9D%BC%201.jpg', info: '더체이스, 영통팬싸, starriver, 깐머리, 꼼데가르송, 폴라포카' },
+{ id: '47', name: 'The Chase 지우 메이크스타', album: 'The Chase', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EB%A9%94%EC%9D%B4%ED%81%AC%EC%8A%A4%ED%83%80%20%EB%8C%80%EB%A9%B4.jpg', info: '더체이스, 대면팬싸, makestar, 깐머리' },
+{ id: '48', name: 'The Chase 지우 뮤직아트 2.0', album: 'The Chase', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EB%AE%A4%EC%A7%81%EC%95%84%ED%8A%B8%20%EB%8C%80%EB%A9%B42.jpg', info: '더체이스, 대면팬싸, musicart, 깐머리' },
+{ id: '49', name: 'The Chase 지우 뮤직아트 3.0', album: 'The Chase', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EB%AE%A4%EC%A7%81%EC%95%84%ED%8A%B8%203.jpg', info: '더체이스, 대면팬싸, musicart, 깐머리, 볼하트' },
+{ id: '50', name: 'The Chase 지우 뮤직아트 4.0', album: 'The Chase', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EB%AE%A4%EC%A7%81%EC%95%84%ED%8A%B8%204.0.jpg', info: '더체이스, 대면팬싸, musicart, 깐머리, 턱받침' },
+{ id: '51', name: 'The Chase 지우 뮤직아트 5.0', album: 'The Chase', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EB%AE%A4%EC%A7%81%EC%95%84%ED%8A%B8%205.0%20%EB%8C%80%EB%A9%B4.jpg', info: '더체이스, 대면팬싸, musicart, 깐머리, 볼' },
+{ id: '52', name: 'The Chase 지우 점프업', album: 'The Chase', category: '팬싸 특전', fsType: '영통', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%A0%90%ED%94%84%EC%97%85%20%EC%98%81%ED%86%B5.jpg', info: '더체이스, 영통팬싸, jumpup, 깐머리, 아디다스집업' },
+{ id: '53', name: 'The Chase 지우 인터아시아', album: 'The Chase', category: '팬싸 특전', fsType: '영통', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%9D%B8%ED%84%B0%EC%95%84%EC%8B%9C%EC%95%84%20%EC%98%81%ED%86%B5.jpg', info: '더체이스, 영통팬싸, interasia, 깐머리, 쇄골' },
+{ id: '54', name: 'The Chase 지우 스타리버 2.0', album: 'The Chase', category: '팬싸 특전', fsType: '영통', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%8A%A4%ED%83%80%EB%A6%AC%EB%B2%84%20%EC%98%81%ED%86%B52.jpg', info: '더체이스, 영통팬싸, starriver, 깐머리, 윙크' },
+{ id: '55', name: 'The Chase 지우 스타리버 폴라 2.0', album: 'The Chase', category: '팬싸 특전', fsType: '영통', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%8A%A4%ED%83%80%EB%A6%AC%EB%B2%84%20%EC%98%81%ED%86%B5%20%ED%8F%B4%EB%9D%BC2.jpg', info: '더체이스, 영통팬싸, starriver, 깐머리, 폴라포카' },
+{ id: '56', name: 'The Chase 지우 뮤직아트', album: 'The Chase', category: '팬싸 특전', fsType: '영통', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EB%AE%A4%EC%A7%81%EC%95%84%ED%8A%B8%20%EC%98%81%ED%86%B5.png', info: '더체이스, 영통팬싸, musicart, 깐머리, 턱받침' },
+{ id: '57', name: 'The Chase 지우 뮤빗몰', album: 'The Chase', category: '팬싸 특전', fsType: '영통', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EB%AE%A4%EB%B9%97%EB%AA%B0%20%EC%98%81%ED%86%B5.jpg', info: '더체이스, 영통팬싸, mubeatmall, 깐머리, 턱받침' },
+{ id: '58', name: 'The Chase 지우 자카르타', album: 'The Chase', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%9E%90%EC%B9%B4%EB%A5%B4%ED%83%80.jpg', info: '더체이스, 대면팬싸, 깐머리, 윙크, 볼하트' },
+{ id: '59', name: 'The Chase 지우 자카르타 카페 이벤트', album: 'The Chase', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%9E%90%EC%B9%B4%EB%A5%B4%ED%83%80%20%EC%B9%B4%ED%8E%98%20%EC%9D%B4%EB%B2%A4%ED%8A%B8%20%ED%8F%AC%EC%B9%B4.jpg', info: '더체이스, 대면팬싸, 깐머리, 윙크, 얼빡, 턱받침' },
+{ id: '60', name: 'The Chase 지우 모켓샵', album: 'The Chase', category: '팬싸 특전', fsType: '영통', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EB%AA%A8%EC%BC%93%EC%83%B5%20%EC%98%81%ED%86%B5.jpg', info: '더체이스, 영통팬싸, mokketshop, 깐머리, 턱받침' },
+{ id: '61', name: 'The Chase 지우 에버라인', album: 'The Chase', category: '팬싸 특전', fsType: '영통', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%97%90%EB%B2%84%EB%9D%BC%EC%9D%B8%20%EC%98%81%ED%86%B5.jpg', info: '더체이스, 영통팬싸, everline, 깐머리, 윙크' },
+{ id: '62', name: 'The Chase 지우 스타리버 3.0', album: 'The Chase', category: '팬싸 특전', fsType: '영통', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%8A%A4%ED%83%80%EB%A6%AC%EB%B2%84%20%EC%98%81%ED%86%B5%203.0.jpg', info: '더체이스, 영통팬싸, starriver, 깐머리, 후드, 윙크' },
+{ id: '63', name: 'The Chase 지우 스타리버 폴라 3.0', album: 'The Chase', category: '팬싸 특전', fsType: '영통', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%8A%A4%ED%83%80%EB%A6%AC%EB%B2%84%20%EC%98%81%ED%86%B5%20%ED%8F%B4%EB%9D%BC%203.jpg', info: '더체이스, 영통팬싸, starriver, 깐머리, 폴라포카' },
+{ id: '64', name: 'The Chase 지우 스타리버 4.0', album: 'The Chase', category: '팬싸 특전', fsType: '영통', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%8A%A4%ED%83%80%EB%A6%AC%EB%B2%84%20%EC%98%81%ED%86%B5%204.jpg', info: '더체이스, 영통팬싸, starriver, 깐머리, 윙크 브이, 얼빡' },
+{ id: '65', name: 'The Chase 지우 스타리버 폴라 4.0', album: 'The Chase', category: '팬싸 특전', fsType: '영통', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%8A%A4%ED%83%80%EB%A6%AC%EB%B2%84%20%EC%98%81%ED%86%B5%20%ED%8F%B4%EB%9D%BC%204.jpg', info: '더체이스, 영통팬싸, starriver, 깐머리, 폴라포카' },
+{ id: '66', name: 'STYLE 지우 에셈타운', album: 'STYLE', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EC%97%90%EC%85%88%20%EB%8C%80%EB%A9%B4.jpg', info: '스타일, 대면팬싸, smtown, 윙크, 아궁빵' },
+{ id: '67', name: 'STYLE 지우 카운트다운 라이브', album: 'STYLE', category: '기타', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EC%B9%B4%EC%9A%B4%ED%8A%B8%20%EB%8B%A4%EC%9A%B4%20%EB%9D%BC%EC%9D%B4%EB%B8%8C.jpg', info: '스타일, countdownlive, 볼콕, 깐머리' },
+{ id: '68', name: 'STYLE 지우 에버라인 1.0', album: 'STYLE', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EC%97%90%EB%B2%84%EB%9D%BC%EC%9D%B8%20%EB%9F%AD%EB%93%9C%201.0.jpg', info: '스타일, everline, 럭드, 윙크, 깐머리' },
+{ id: '69', name: 'STYLE 지우 에버라인 폴라 1.0', album: 'STYLE', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EC%97%90%EB%B2%84%EB%9D%BC%EC%9D%B8%20%EB%9F%AD%EB%93%9C%20%ED%8F%B4%EB%9D%BC%201.0.jpg', info: '스타일, everline, 폴라포카, luckydraw, 앙' },
+{ id: '70', name: 'STYLE 지우 인터아시아 1.0', album: 'STYLE', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EC%9D%B8%ED%84%B0%EC%95%84%EC%8B%9C%EC%95%84%20%EB%9F%AD%EB%93%9C%201.0.jpg', info: '스타일, interasia, luckydraw, 안경, 앞머리, 브이' },
+{ id: '71', name: 'STYLE 지우 인터아시아 폴라 1.0', album: 'STYLE', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EC%9D%B8%ED%84%B0%EC%95%84%EC%8B%9C%EC%95%84%20%EB%9F%AD%EB%93%9C%20%ED%8F%B4%EB%9D%BC%201.0.jpg', info: '스타일, interasia, luckydraw, 앙, 깐머리, 폴라포카' },
+{ id: '72', name: 'The Chase 지우 Photobook Ver.', album: '유닛 포카', category: 'The Chase', fsType: '대면', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%ED%8F%AC%ED%86%A0%EB%B6%81%20%EC%9C%A0%EB%8B%9B.jpg', info: '더체이스, 대면팬싸, 앨범포카, 깐머리, 하트, 예온, 유닛, unit, yeon' },
+{ id: '73', name: 'STYLE 지우 점프업 1.0', album: 'STYLE', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EC%A0%90%ED%94%84%EC%97%85%20%EB%9F%AD%EB%93%9C%201.0.jpg', info: '스타일, jumpup, luckydraw' },
+{ id: '74', name: 'STYLE 지우 점프업 폴라 1.0', album: 'STYLE', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EC%A0%90%ED%94%84%EC%97%85%20%EB%9F%AD%EB%93%9C%20%ED%8F%B4%EB%9D%BC%201.0.jpg', info: '스타일, jumpup, luckydraw, 폴라포카, 꽃받침, 턱받침' },
+{ id: '75', name: 'STYLE 지우 케이타운포유 1.0', album: 'STYLE', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EC%BC%80%ED%83%80%ED%8F%AC%20%EB%9F%AD%EB%93%9C%201.0.jpg', info: '스타일, ktown4u, luckydraw, 턱받침' },
+{ id: '76', name: 'STYLE 지우 케이타운포유 폴라 1.0', album: 'STYLE', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EC%BC%80%ED%83%80%ED%8F%AC%20%EB%9F%AD%EB%93%9C%20%ED%8F%B4%EB%9D%BC%201.0.jpg', info: '스타일, ktown4u, luckydraw, 폴라포카, 볼하트' },
+{ id: '77', name: 'STYLE 지우 모켓샵 1.0', album: 'STYLE', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EB%AA%A8%EC%BC%93%EC%83%B5%201.0.jpg', info: '스타일, mokketshop, luckydraw, 넥타이' },
+{ id: '78', name: 'STYLE 지우 모켓샵 폴라 1.0', album: 'STYLE', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EB%AA%A8%EC%BC%93%EC%83%B5%20%ED%8F%B4%EB%9D%BC%201.0.jpg', info: '스타일, mokketshop, luckydraw, 폴라포카, 꽃받침, 턱받침' },
+{ id: '79', name: 'STYLE 지우 뮤빗 1.0', album: 'STYLE', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EB%AE%A4%EB%B9%97%201.0.jpg', info: '스타일, mubeat, luckydraw, 넥타이' },
+{ id: '80', name: 'STYLE 지우 뮤빗 폴라 1.0', album: 'STYLE', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EB%AE%A4%EB%B9%97%20%ED%8F%B4%EB%9D%BC%201.0.jpg', info: '스타일, mubeat, luckydraw, 폴라포카, 브이' },
+{ id: '81', name: 'STYLE 지우 에버라인 2.0', album: 'STYLE', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EC%97%90%EB%B2%84%EB%9D%BC%EC%9D%B8%202.0.jpg', info: '스타일, everline, luckydraw, 고양이, 앙' },
+{ id: '82', name: 'STYLE 지우 에버라인 폴라 2.0', album: 'STYLE', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EC%97%90%EB%B2%84%EB%9D%BC%EC%9D%B8%20%ED%8F%B4%EB%9D%BC%202.0.jpg', info: '스타일, everline, 폴라포카, luckydraw, 고양이, 앙' },
+{ id: '83', name: 'STYLE 지우 인터아시아 2.0', album: 'STYLE', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EC%9D%B8%ED%84%B0%EC%95%84%EC%8B%9C%EC%95%84%202.0.jpg', info: '스타일, interasia, luckydraw, 윙크, 인형, 브이' },
+{ id: '84', name: 'STYLE 지우 인터아시아 폴라 2.0', album: 'STYLE', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EC%9D%B8%ED%84%B0%EC%95%84%EC%8B%9C%EC%95%84%20%ED%8F%B4%EB%9D%BC%202.0.jpg', info: '스타일, interasia, luckydraw, 폴라포카, 곰인형, 브이' },
+{ id: '85', name: 'STYLE 지우 점프업 2.0', album: 'STYLE', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EC%A0%90%ED%94%84%EC%97%85%202.0.jpg', info: '스타일, jumpup, luckydraw, 개구리, 인형, 우비' },
+{ id: '86', name: 'STYLE 지우 점프업 폴라 2.0', album: 'STYLE', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EC%A0%90%ED%94%84%EC%97%85%20%ED%8F%B4%EB%9D%BC%202.0.png', info: '스타일, jumpup, luckydraw, 폴라포카, 개구리, 인형, 우비' },
+{ id: '87', name: 'STYLE 지우 케이타운포유 2.0', album: 'STYLE', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EC%BC%80%ED%83%80%ED%8F%AC%202.0.jpg', info: '스타일, ktown4u, luckydraw, 핀, 뿔, 이라이라' },
+{ id: '88', name: 'STYLE 지우 케이타운포유 폴라 2.0', album: 'STYLE', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%EC%BC%80%ED%83%80%ED%8F%AC%202.0%20%ED%8F%B4%EB%9D%BC.jpg', info: '스타일, ktown4u, luckydraw, 폴라포카, 핀, 이라이라, 뿔' },
+{ id: '89', name: 'STYLE 지우 뮤빗 2.0', album: 'STYLE', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EB%AE%A4%EB%B9%97%202.0.jpg', info: '스타일, mubeat, luckydraw, 머리끈, 머묶, 고무줄' },
+{ id: '90', name: 'STYLE 지우 뮤빗 폴라 2.0', album: 'STYLE', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EB%AE%A4%EB%B9%97%20%ED%8F%B4%EB%9D%BC%202.0.jpg', info: '스타일, mubeat, luckydraw, 폴라포카, 머리끈, 머묶, 고무줄' },
+{ id: '91', name: 'STYLE 지우 에셈타운 1.0', album: 'STYLE', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EC%97%90%EC%85%88%201.0.jpg', info: '스타일, smtown, luckydraw, 잔머리, 늑대, 빨간망토' },
+{ id: '92', name: 'STYLE 지우 에셈타운 폴라 1.0', album: 'STYLE', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EC%97%90%EC%85%88%20%ED%8F%B4%EB%9D%BC%202.0.jpg', info: '스타일, smtown, luckydraw, 잔머리, 늑대, 폴라포카, 빨간망토, 폴라포카' },
+{ id: '93', name: 'STYLE 지우 사운드웨이브 1.0', album: 'STYLE', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EC%82%AC%EC%9A%B4%EB%93%9C%20%EC%9B%A8%EC%9D%B4%EB%B8%8C%201.0.jpg', info: '스타일, soundwave, luckydraw, 잔머리, 딸기, 어린이, 보자기' },
+{ id: '94', name: 'STYLE 지우 사운드웨이브 폴라 1.0', album: 'STYLE', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EC%82%AC%EC%9A%B4%EB%93%9C%20%EC%9B%A8%EC%9D%B4%EB%B8%8C%20%ED%8F%B4%EB%9D%BC%201.0.jpg', info: '스타일, soundwave, luckydraw, 잔머리, 딸기, 어린이, 보자기, 폴라포카' },
+{ id: '95', name: 'STYLE 지우 위드뮤 1.0', album: 'STYLE', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EC%9C%84%EB%93%9C%EB%AE%A4%201.0.jpg', info: '스타일, withmuu, luckydraw, 날개, 천사, 잔머리, 턱받침 ' },
+{ id: '96', name: 'STYLE 지우 위드뮤 폴라 1.0', album: 'STYLE', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EC%9C%84%EB%93%9C%EB%AE%A4%20%ED%8F%B4%EB%9D%BC%201.0.jpg', info: '스타일, withmuu, luckydraw, 날개, 천사, 폴라포카 ' },
+{ id: '97', name: 'STYLE 지우 에버라인 3.0', album: 'STYLE', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EC%97%90%EB%B2%84%EB%9D%BC%EC%9D%B8%203.0.jpg', info: '스타일, everline, luckydraw, 리본, 머리띠, 볼하트, 고양이, 잔머리' },
+{ id: '98', name: 'STYLE 지우 에버라인 3.0', album: '유닛 포카', category: 'STYLE', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EC%97%90%EB%B2%84%EB%9D%BC%EC%9D%B8%20%EC%9C%A0%EB%8B%9B%203.0.jpg', info: '스타일, everline, luckydraw, 리본, 머리띠, 고양이, 볼콕, 스텔라, stella, 스타즈, 유닛, unit' },
+{ id: '99', name: 'STYLE 지우 인터아시아 3.0', album: 'STYLE', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EC%9D%B8%ED%84%B0%EC%95%84%EC%8B%9C%EC%95%84%203.0.jpg', info: '스타일, interasia, luckydraw, 안경만두, 안경, 만두, 잔머리' },
+{ id: '100', name: 'STYLE 지우 인터아시아 3.0', album: '유닛 포카', category: 'STYLE', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EC%9D%B8%ED%84%B0%EC%95%84%EC%8B%9C%EC%95%84%20%EC%9C%A0%EB%8B%9B%203.0.jpg', info: '스타일, interasia, luckydraw, 안경만두, 안경, 만두, 예온, 유닛, unit, yeon, 잔머리' },
+{ id: '101', name: 'STYLE 지우 점프업 3.0', album: 'STYLE', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EC%A0%90%ED%94%84%EC%97%85%203.0.jpg', info: '스타일, jumpup, luckydraw, 당근, 토끼, 머리띠, 잔머리' },
+{ id: '102', name: 'STYLE 지우 점프업 3.0', album: '유닛 포카', category: 'STYLE', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EC%A0%90%ED%94%84%EC%97%85%20%EC%9C%A0%EB%8B%9B%203.0.jpg', info: '스타일, jumpup, luckydraw, 안경만두, 당근, 토끼, 이안, 유닛, 이지즈, unit, ian' },
+{ id: '103', name: 'STYLE 지우 케이타운포유 3.0', album: 'STYLE', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EC%BC%80%ED%83%80%ED%8F%AC%203.0.jpg', info: '스타일, ktown4u, luckydraw, 이불, 잔머리' },
+{ id: '104', name: 'STYLE 지우 케이타운포유 3.0', album: '유닛 포카', category: 'STYLE', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EC%BC%80%ED%83%80%ED%8F%AC%20%EC%9C%A0%EB%8B%9B%203.0.jpg', info: '스타일, ktown4u, luckydraw, 이불, unit, 주은, juun, 우주즈, 잔머리' },
+{ id: '105', name: 'STYLE 지우 뮤빗 3.0', album: 'STYLE', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EB%AE%A4%EB%B9%97%203.0.jpg', info: '스타일, mubeat, luckydraw, 토끼, 머리띠' },
+{ id: '106', name: 'STYLE 지우 뮤빗 3.0', album: '유닛 포카', category: 'STYLE', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EB%AE%A4%EB%B9%97%20%EC%9C%A0%EB%8B%9B%203.0.jpg', info: '스타일, mubeat, luckydraw, 토끼, 머리띠, 밀크즈, 유하, yuha, 유닛, unit' },
+{ id: '107', name: 'STYLE 지우 에스엠타운 2.0', album: 'STYLE', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EC%97%90%EC%85%88%202.0.jpg', info: '스타일, smtown, luckydraw, 요술봉, 잔머리, 공주, 머리띠, 잔머리' },
+{ id: '108', name: 'STYLE 지우 에셈타운 2.0', album: '유닛 포카', category: 'STYLE', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EC%97%90%EC%85%88%20%EC%9C%A0%EB%8B%9B%202.0.jpg', info: '스타일, smtown, luckydraw, 요술봉, 카르멘, carmen, 카우즈, 유닛, unit, 잔머리' },
+{ id: '109', name: 'STYLE 지우 위드뮤 2.0', album: 'STYLE', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EC%9C%84%EB%93%9C%EB%AE%A4%202.0.jpg', info: '스타일, withmuu, luckydraw, 베레모, 충성, 윙크' },
+{ id: '110', name: 'STYLE 지우 위드뮤 2.0', album: '유닛 포카', category: 'STYLE', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EC%9C%84%EB%93%9C%EB%AE%A4%20%EC%9C%A0%EB%8B%9B%202.0.jpg', info: '스타일, withmuu, luckydraw, 베레모, 볼콕, 에이나, ana, 에츄즈, 유닛, unit' },
+{ id: '111', name: 'STYLE 지우 스타일링 세트', album: 'MD 포카', category: 'STYLE', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EC%97%A0%EB%94%94%20%EC%8A%A4%ED%83%80%EC%9D%BC%EB%A7%81%20%EC%84%B8%ED%8A%B8.jpg', info: '스타일, stylingset, 홀로그램, 앞머리, 안경, 손가락' },
+{ id: '112', name: 'The Chase 지우 Package Ver.', album: 'The Chase', category: '앨범 포카', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%EC%9D%B4%EC%8A%A4%20%ED%8C%A8%ED%82%A4%EC%A7%80%20%EB%8B%A8%EC%B2%B4.jpg', info: '더체이스, 앨범포카, 단체' },
+{ id: '113', name: '지우 생일 2025 파티 카드', album: 'MD 포카', category: 'BIRTHDAY', version: 'Package Ver.', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%EC%A7%80%EC%9A%B0%202025%20%EC%83%9D%EC%9D%BC%20%ED%8C%8C%ED%8B%B0%EC%B9%B4%EB%93%9C.jpg', info: '손가락, 잔머리, partycard, 엠디' },
+{ id: '114', name: '지우 생일 2025 파우치 팩', album: 'MD 포카', category: 'BIRTHDAY', version: 'Package Ver.', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%EC%A7%80%EC%9A%B0%202025%20%EC%83%9D%EC%9D%BC%20%ED%8C%8C%EC%9A%B0%EC%B9%98%ED%8C%A9.jpg', info: '손가락, 쉿, 잔머리, partycard, 엠디' },
+{ id: '115', name: '지우 Scarlett', album: '기타', category: 'scarlett', version: 'Package Ver.', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%EC%A7%80%EC%9A%B0%20%EC%8A%A4%EC%B9%BC%EB%A0%9B.jpg', info: '스칼렛, 콜라보' },
+{ id: '116', name: 'FOCUS 지우 PhotoBook Ver.', album: 'FOCUS', category: '앨범 포카', version: 'PhotoBook Ver.', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%ED%8F%AC%ED%86%A0%EB%B6%81%201.jpg', info: '포커스, 깐머리, 턱받침, 토포북, 톰브라운, 앨범포카' },
+{ id: '117', name: 'FOCUS 지우 PhotoBook Ver.', album: 'FOCUS', category: '앨범 포카', version: 'PhotoBook Ver.', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%ED%8F%AC%ED%86%A0%EB%B6%81%20%EB%8B%A8%EC%B2%B4%201.jpg', info: '포커스, 단체, 포토북, 앨범포카' },
+{ id: '118', name: 'FOCUS 지우 PhotoBook Ver.', album: 'FOCUS', category: '앨범 포카', version: 'PhotoBook Ver.', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%ED%8F%AC%ED%86%A0%EB%B6%81%20%EB%8B%A8%EC%B2%B4%202.jpg', info: '포커스, 단체, 포토북, 앨범포카' },
+{ id: '119', name: 'FOCUS 지우 PhotoBook Ver.', album: 'FOCUS', category: '앨범 포카', version: 'PhotoBook Ver.', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%ED%8F%AC%ED%86%A0%EB%B6%81%20%EB%8B%A8%EC%B2%B4%203.jpg', info: '포커스, 단체, 포토북, 앨범포카, 톰브라운' },
+{ id: '120', name: 'FOCUS 지우 Rule Book Ver.', album: 'FOCUS', category: '앨범 포카', version: 'Rule Book Ver.', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EB%A3%B0%20%EB%B6%81.jpg', info: '포커스, 깐머리, 잔머리, 룰북, 볼콕, 앨범포카' },
+{ id: '121', name: 'FOCUS 지우 Rule Book Ver.', album: '유닛 포카', category: 'FOCUS', version: 'Rule Book Ver.', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EB%A3%B0%20%EB%B6%81%20%EC%9C%A0%EB%8B%9B.jpg', info: '포커스, 깐머리, 룰북, 볼하트, 유하, 밀크즈, yuha, 앨범포카' },
+{ id: '122', name: 'FOCUS 지우 Heart Locket Ver.', album: 'FOCUS', category: '앨범 포카', version: 'Heart Locket Ver.', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%ED%95%98%ED%8A%B8%EB%A1%9C%EC%BC%93.jpg', info: '포커스, 앨범포카, 하트로켓, 브이' },
+{ id: '123', name: 'FOCUS 지우 Heart Locket Ver.', album: '유닛 포카', category: 'FOCUS', version: 'Heart Locket Ver.', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%ED%95%98%ED%8A%B8%EB%A1%9C%EC%BC%93%20%EC%9C%A0%EB%8B%9B.jpg', info: '포커스, 앨범포카, 유닛, 에이나, 유하, ana, yuha, 아이스크림 하트로켓' },
+{ id: '124', name: 'FOCUS 지우 SMini Ver.', album: 'FOCUS', category: '앨범 포카', version: 'SMini Ver.', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%8A%A4%EB%AF%B8%EB%8B%88.jpg', info: '포커스, 앨범포카, 스미니, 윙크, 잔머리' },
+{ id: '125', name: 'FOCUS 지우 애플뮤직', album: 'FOCUS', category: '예판 특전', version: 'Package Ver.', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%95%A0%ED%94%8C%20%EB%AE%A4%EC%A7%81%20%EC%98%88%ED%8C%90.jpg', info: '포커스, applemusic, 손, 발레복, 깐머리' },
+{ id: '126', name: 'FOCUS 지우 에버라인', album: 'FOCUS', category: '예판 특전', version: 'Package Ver.', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%97%90%EB%B2%84%EB%9D%BC%EC%9D%B8%20%EC%98%88%ED%8C%90.jpg', info: '포커스, everline, 손, 잔머리, 깐머리' },
+{ id: '127', name: 'FOCUS 지우 케이타운포유', album: 'FOCUS', category: '예판 특전', version: 'Package Ver.', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%BC%80%ED%83%80%ED%8F%AC%20%EC%98%88%ED%8C%90.jpg', info: '포커스, ktown4u, 손, 잔머리, 깐머리, 반묶음, 손' },
+{ id: '128', name: 'FOCUS 지우 메이크스타', album: 'FOCUS', category: '예판 특전', version: 'Package Ver.', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EB%A9%94%EC%9D%B4%ED%81%AC%EC%8A%A4%ED%83%80%20%EC%98%88%ED%8C%90.jpg', info: '포커스, makestar, 손, 잔머리, 깐머리, 집업' },
+{ id: '129', name: 'FOCUS 지우 미니레코드', album: 'FOCUS', category: '예판 특전', version: 'Package Ver.', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EB%AF%B8%EB%8B%88%EB%A0%88%EC%BD%94%EB%93%9C%20%EC%98%88%ED%8C%90.jpg', info: '포커스, minirecord, 모자, 턱받침' },
+{ id: '130', name: 'FOCUS 지우 에셈타운 ', album: 'FOCUS', category: '예판 특전', version: 'Package Ver.', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%97%90%EC%85%88%ED%83%80%EC%9A%B4%20%EC%98%88%ED%8C%90.jpg', info: '포커스, smtown, 볼하트, 잔머리, 깐머리' },
+{ id: '131', name: 'FOCUS 지우 사운드웨이브 ', album: 'FOCUS', category: '예판 특전', version: 'Package Ver.', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%82%AC%EC%9B%A8%20%EC%98%88%ED%8C%90.jpg', info: '포커스, soundwave, 앙, 잔머리, 깐머리' },
+{ id: '132', name: 'FOCUS 지우 스타리버 ', album: 'FOCUS', category: '예판 특전', version: 'Package Ver.', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%8A%A4%ED%83%80%EB%A6%AC%EB%B2%84%20%EC%98%88%ED%8C%90.jpg', info: '포커스, starriver, 잔머리, 깐머리' },
+{ id: '133', name: 'FOCUS 지우 스타리버 폴라', album: 'FOCUS', category: '예판 특전', version: 'Package Ver.', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%8A%A4%ED%83%80%EB%A6%AC%EB%B2%84%20%EC%98%88%ED%8C%90%20%ED%8F%B4%EB%9D%BC1.jpg', info: '포커스, starriver, 폴라포카, 셔츠, 깐머리' },
+{ id: '134', name: 'FOCUS 지우 스타리버 폴라', album: 'FOCUS', category: '예판 특전', version: 'Package Ver.', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%8A%A4%ED%83%80%EB%A6%AC%EB%B2%84%20%EC%98%88%ED%8C%90%20%ED%8F%B4%EB%9D%BC%202.jpg', info: '포커스, starriver, 폴라포카, 볼콕, 깐머리' },
+{ id: '135', name: 'FOCUS 지우 위버스', album: 'FOCUS', category: '예판 특전', version: 'Package Ver.', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%9C%84%EB%B2%84%EC%8A%A4%20%EC%98%88%ED%8C%90.jpg', info: '포커스, weverse, mz샷, 잔머리, 깐머리' },
+{ id: '136', name: 'FOCUS 지우 인터아시아', album: 'FOCUS', category: '예판 특전', version: 'Package Ver.', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%9D%B8%ED%84%B0%EC%95%84%EC%8B%9C%EC%95%84%20%EC%98%88%ED%8C%90.jpg', info: '포커스, interasia, 손, 깐머리' },
+{ id: '137', name: 'FOCUS 지우 점프업', album: 'FOCUS', category: '예판 특전', version: 'Package Ver.', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%A0%90%ED%94%84%EC%97%85%20%EC%98%88%ED%8C%90.jpg', info: '포커스, jumpup, 볼하트, 잔머리, 깐머리' },
+{ id: '138', name: 'FOCUS 지우 엔와이뮤직', album: 'FOCUS', category: '예판 특전', version: 'Package Ver.', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%97%94%EC%99%80%EC%9D%B4%EB%AE%A4%EC%A7%81%20%EC%98%88%ED%8C%90.jpg', info: '포커스, nymusic, 손, 깐머리' },
+{ id: '139', name: 'FOCUS 지우 위버스샵', album: 'FOCUS', category: '예판 특전', version: 'Package Ver.', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%9C%84%EB%B2%84%EC%8A%A4%EC%83%B5%20%EC%98%88%ED%8C%90.jpg', info: '포커스, weverseshop, 볼하트, 쇄골, 깐머리' },
+{ id: '140', name: 'FOCUS 지우 미니레코드', album: 'FOCUS', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EB%AF%B8%EB%8B%88%EB%A0%88%EC%BD%94%EB%93%9C%20%EB%8C%80%EB%A9%B4.jpg', info: '포커스, minirecord, 브이, 대면, 집업' },
+{ id: '141', name: 'FOCUS 지우 케이타운포유', album: 'FOCUS', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%BC%80%ED%83%80%ED%8F%AC%20%EB%8C%80%EB%A9%B4.jpg', info: '포커스, 대면, ktown4u, 턱받침, 깐머리' },
+{ id: '142', name: 'FOCUS 지우 애플뮤직 1.0', album: 'FOCUS', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%95%A0%ED%94%8C%EB%AE%A4%EC%A7%81%20%EB%8C%80%EB%A9%B4%201.0.jpg', info: '포커스, 대면, applemusic, 볼콕, 반묶음, 수트, 깐머리' },
+{ id: '143', name: 'FOCUS 지우 점프업', album: 'FOCUS', category: '팬싸 특전', fsType: '영통', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%A0%90%ED%94%84%EC%97%85%20%EC%98%81%ED%86%B5.jpg', info: '포커스, jumpup, 볼콕, 셔츠, 깐머리' },
+{ id: '144', name: 'FOCUS 지우 스타리버 1.0', album: 'FOCUS', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%8A%A4%ED%83%80%EB%A6%AC%EB%B2%84%20%EB%8C%80%EB%A9%B4%201.0.jpg', info: '포커스, starriver, 윙크, 핀, 깐머리' },
+{ id: '145', name: 'STYLE 지우 스타리버 1.0', album: 'FOCUS', category: '팬싸 특전', fsType: '대면', imgUrl: '', info: '포커스, starriver, 깐머리' },
+{ id: '146', name: 'STYLE 지우 스타리버 1.0', album: 'FOCUS', category: '팬싸 특전', fsType: '대면', imgUrl: '', info: '포커스, starriver, 볼하트' },
+{ id: '147', name: 'STYLE 지우 엔와이뮤직', album: 'FOCUS', category: '팬싸 특전', fsType: '대면', imgUrl: '', info: '포커스, 안경, 수트, nymusic' },
+{ id: '148', name: 'FOCUS 지우 미니레코드', album: 'FOCUS', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EB%AF%B8%EB%8B%88%EB%A0%88%EC%BD%94%EB%93%9C%20%EB%9F%AD%EB%93%9C.jpg', info: '포커스, 볼콕, luckydraws, 반묶음, minirecord' },
+{ id: '149', name: 'FOCUS 지우 메이크스타', album: 'FOCUS', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EB%A9%94%EC%9D%B4%ED%81%AC%EC%8A%A4%ED%83%80%20%EB%9F%AD%EB%93%9C.jpg', info: '포커스, makestar, 얼빡, 멜빵' },
+{ id: '150', name: 'FOCUS 지우 애플뮤직', album: 'FOCUS', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%95%A0%ED%94%8C%EB%AE%A4%EC%A7%81%20%EB%9F%AD%EB%93%9C.jpg', info: '포커스, applemusic, luckydraws, 갈발, 잔머리' },
+{ id: '151', name: 'FOCUS 지우 후즈팬', album: 'FOCUS', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%ED%9B%84%EC%A6%88%ED%8C%AC%20%EB%9F%AD%EB%93%9C.jpg', info: '포커스, whosfan, luckydraws, 사과머리' },
+{ id: '152', name: 'FOCUS 지우 에셈타운', album: 'FOCUS', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%97%90%EC%85%88%ED%83%80%EC%9A%B4%20%EB%9F%AD%EB%93%9C.jpg', info: '포커스, smtown, 한복, luckydraws, 턱받침' },
+{ id: '153', name: 'FOCUS 지우 엔와이뮤직', album: 'FOCUS', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%97%94%EC%99%80%EC%9D%B4%EB%AE%A4%EC%A7%81%20%EB%8C%80%EB%A9%B4.jpg', info: '포커스, nymusic, 수트, 안경, 넥타이' },
+{ id: '154', name: 'FOCUS 지우 뮤직코리아', album: 'FOCUS', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EB%AE%A4%EC%A7%81%EC%BD%94%EB%A6%AC%EC%95%84%20%EB%8C%80%EB%A9%B4.jpg', info: '포커스, 볼하트, 머리띠, 윙크' },
+{ id: '155', name: 'FOCUS 지우 스타리버 2.0', album: 'FOCUS', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%8A%A4%ED%83%80%EB%A6%AC%EB%B2%84%202.0%201.jpg', info: '포커스, starriver, 볼하트, 윙크, 반묶음' },
+{ id: '156', name: 'FOCUS 지우 스타리버 2.0', album: 'FOCUS', category: '팬싸 특전', fsType: '대면', imgUrl: '', info: '포커스, starriver, 턱, 손, 엣지' },
+{ id: '157', name: 'FOCUS 지우 스타리버 2.0', album: 'FOCUS', category: '팬싸 특전', fsType: '대면', imgUrl: '', info: '포커스, starriver, 핫도그' },
+{ id: '158', name: 'FOCUS 지우 엔와이뮤직', album: 'FOCUS', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%97%94%EC%99%80%EC%9D%B4%EB%AE%A4%EC%A7%81%20%EB%9F%AD%EB%93%9C.jpg', info: '포커스, nymusic, luckydraws, 턱받침' },
+{ id: '159', name: 'FOCUS 지우 뮤직아트', album: 'FOCUS', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EB%AE%A4%EC%A7%81%EC%95%84%ED%8A%B8%20%EB%9F%AD%EB%93%9C.jpg', info: '포커스, musicart, 턱받침, luckydraws, 꽃받침' },
+{ id: '160', name: 'FOCUS 지우 에버라인', album: 'FOCUS', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%97%90%EB%B2%84%EB%9D%BC%EC%9D%B8%20%EB%9F%AD%EB%93%9C.jpg', info: '포커스, everline, 턱받침, luckydraws, 꽃받침' },
+{ id: '161', name: 'FOCUS 지우 인터아시아', album: 'FOCUS', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%9D%B8%ED%84%B0%EC%95%84%EC%8B%9C%EC%95%84%20%EB%9F%AD%EB%93%9C.jpg', info: '포커스, interasia, luckydraws, 손, 쇄골' },
+{ id: '162', name: 'FOCUS 지우 사운드웨이브', album: 'FOCUS', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%82%AC%EC%9A%B4%EB%93%9C%EC%9B%A8%EC%9D%B4%EB%B8%8C%20%ED%8C%AC%EC%8B%B8.jpg', info: '포커스, soundwave, 핀, 정장' },
+{ id: '163', name: 'FOCUS 지우 에셈타운', album: 'FOCUS', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%97%90%EC%85%88%ED%83%80%EC%9A%B4%20%EB%8C%80%EB%A9%B4.jpg', info: '포커스, smtown, 볼콕' },
+{ id: '164', name: 'FOCUS 지우 에버라인', album: 'FOCUS', category: '팬싸 특전', fsType: '영통', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%97%90%EB%B2%84%EB%9D%BC%EC%9D%B8%20%EC%98%81%ED%86%B5.jpg', info: '포커스, everline, 볼하트' },
+{ id: '165', name: 'FOCUS 지우 뮤직아트', album: 'FOCUS', category: '팬싸 특전', fsType: '영통', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EB%AE%A4%EC%A7%81%EC%95%84%ED%8A%B8%20%EC%98%81%ED%86%B5.jpg', info: '포커스, musicart, 볼찌빵, 후드' },
+{ id: '166', name: 'FOCUS 지우 애플뮤직', album: 'FOCUS', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%95%A0%ED%94%8C%EB%AE%A4%EC%A7%81%20%EB%8C%80%EB%A9%B4%202.0.jpg', info: '포커스, applemusic, 앙' },
+{ id: '167', name: 'FOCUS 지우 후즈팬', album: 'FOCUS', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%ED%9B%84%EC%A6%88%ED%8C%AC%20%EB%8C%80%EB%A9%B4.jpg', info: '포커스, whosfan, 집업, 반묶음, 윙크' },
+{ id: '168', name: 'FOCUS 지우 에이치엠브이', album: 'FOCUS', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%97%90%EC%B9%98%EC%97%A0%EB%B8%8C%EC%9D%B4%20%EB%9F%AD%EB%93%9C.jpg', info: '포커스, hmv, luckydraws, 턱받침, 잔머리' },
+{ id: '169', name: 'FOCUS 지우 헬로라이브 1.0', album: 'FOCUS', category: '팬싸 특전', fsType: '영통', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%ED%97%AC%EB%A1%9C%EB%9D%BC%EC%9D%B4%EB%B8%8C%20%EC%98%81%ED%86%B5%201.0.jpg', info: '포커스, hellolive, 볼꼬집, 목도리' },
+{ id: '170', name: 'FOCUS 지우 메이크스타', album: 'FOCUS', category: '팬싸 특전', fsType: '영통', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EB%A9%94%EC%9D%B4%ED%81%AC%EC%8A%A4%ED%83%80%20%EC%98%81%ED%86%B5.jpg', info: '포커스, 볼콕, makestar' },
+{ id: '171', name: 'FOCUS 지우 스타리버 2.0', album: 'FOCUS', category: '팬싸 특전', fsType: '영통', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%8A%A4%ED%83%80%EB%A6%AC%EB%B2%84%20%EC%98%81%ED%86%B5%202.0.jpg', info: '포커스, starriver, 볼하트' },
+{ id: '172', name: 'STYLE 지우 스타리버 폴라 2.0', album: 'FOCUS', category: '팬싸 특전', fsType: '영통', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%8A%A4%ED%83%80%EB%A6%AC%EB%B2%84%20%EC%98%81%ED%86%B5%20%ED%8F%B4%EB%9D%BC%202.0.jpg', info: '포커스, starriver, 꽃받침, 턱받침, 폴라포카' },
+{ id: '173', name: 'FOCUS 지우 인터아시아', album: 'FOCUS', category: '팬싸 특전', fsType: '영통', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%9D%B8%ED%84%B0%EC%95%84%EC%8B%9C%EC%95%84%20%EC%98%81%ED%86%B5.jpg', info: '포커스, interasia, 볼하트' },
+{ id: '174', name: 'FOCUS 지우 애플뮤직', album: 'FOCUS', category: '팬싸 특전', fsType: '영통', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%95%A0%ED%94%8C%EB%AE%A4%EC%A7%81%20%EC%98%81%ED%86%B5.jpg', info: '포커스, applemusic, 볼하트' },
+{ id: '175', name: 'FOCUS 지우 애플뮤직 2.0', album: 'FOCUS', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%95%A0%ED%94%8C%EB%AE%A4%EC%A7%81%20%EB%9F%AD%EB%93%9C%202.0.jpg', info: '포커스, 목도리, luckydraws, applemusic' },
+{ id: '176', name: 'FOCUS 지우 헬로라이브', album: 'FOCUS', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%ED%97%AC%EB%A1%9C%EB%9D%BC%EC%9D%B4%EB%B8%8C%20%EB%9F%AD%EB%93%9C.jpg', info: '포커스, luckydraws, 안경, 셔츠, 브이' },
+{ id: '177', name: 'FOCUS 지우 점프업', album: 'FOCUS', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%A0%90%ED%94%84%EC%97%85%20%EB%9F%AD%EB%93%9C.jpg', info: '포커스, jumpup, 산타, 인형, luckydraws, 머리띠, 토끼' },
+{ id: '178', name: 'FOCUS 지우 케이타운포유', album: 'FOCUS', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%BC%80%ED%83%80%ED%8F%AC%20%EB%9F%AD%EB%93%9C.jpg', info: '포커스, ktown4u, luckydraws, 붕어빵, 보자기' },
+{ id: '179', name: 'FOCUS 지우 미니레코드 2.0', album: 'FOCUS', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EB%AF%B8%EB%8B%88%EB%A0%88%EC%BD%94%EB%93%9C%202.0%20%EB%9F%AD%EB%93%9C.jpg', info: '포커스, 망토, 조명, luckydraw' },
+{ id: '180', name: 'FOCUS 지우 사운드웨이브', album: 'FOCUS', category: '팬싸 특전', fsType: '영통', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%82%AC%EC%9A%B4%EB%93%9C%EC%9B%A8%EC%9D%B4%EB%B8%8C%20%EC%98%81%ED%86%B5.jpg', info: '포커스, soundwave, 비니, 안경, 쇄골, 브이' },
+{ id: '181', name: 'FOCUS 지우 헬로라이브 2.0', album: 'FOCUS', category: '팬싸 특전', fsType: '영통', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%ED%97%AC%EB%A1%9C%EB%9D%BC%EC%9D%B4%EB%B8%8C%20%EC%98%81%ED%86%B5%202.0.jpg', info: '포커스, hellolive, 얼빡, 하트, 윙크' },
+{ id: '182', name: 'FOCUS 지우 엔와이뮤직', album: 'FOCUS', category: '팬싸 특전', fsType: '영통', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%97%94%EC%99%80%EC%9D%B4%EB%AE%A4%EC%A7%81%20%EC%98%81%ED%86%B5.jpg', info: '포커스, nymusic, 하트, 앞머리, 윙크' },
+{ id: '183', name: 'FOCUS 지우 애플뮤직 2.0', album: 'FOCUS', category: '팬싸 특전', fsType: '영통', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%95%A0%ED%94%8C%EB%AE%A4%EC%A7%81%20%EC%98%81%ED%86%B5%202.0.jpg', info: '포커스, applemusic, 윙크, 앞머리, 사과머리, 앙, 폴로' },
+{ id: '184', name: 'FOCUS 지우 스타리버', album: 'FOCUS', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%8A%A4%ED%83%80%EB%A6%AC%EB%B2%84%20%EB%9F%AD%EB%93%9C.jpg', info: '포커스, luckydraw, starriver, 윙크, 셔츠' },
+{ id: '185', name: 'FOCUS 지우 사운드웨이브', album: 'FOCUS', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%82%AC%EC%9A%B4%EB%93%9C%EC%9B%A8%EC%9D%B4%EB%B8%8C%20%EB%9F%AD%EB%93%9C.jpg', info: '포커스, soundwave, 턱받침, 수트, luckydraws' },
+{ id: '186', name: 'RUDE! 지우 애플뮤직 1.0', album: 'RUDE!', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-0aa81fe623d34e639a4ab4e0651c881c.r2.dev/%EB%A3%A8%EB%93%9C%20%EC%95%A0%ED%94%8C%EB%AE%A4%EC%A7%81%20%EB%9F%AD%EB%93%9C.jpg', info: '루드, applemusic, 앞머리, mz샷' },
+{ id: '187', name: 'RUDE! 지우 헬로라이브 1.0', album: 'RUDE!', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-0aa81fe623d34e639a4ab4e0651c881c.r2.dev/%EB%A3%A8%EB%93%9C%20%ED%97%AC%EB%A1%9C%EB%9D%BC%EC%9D%B4%EB%B8%8C%20%EB%9F%AD%EB%93%9C.jpg', info: '루드, hellolive, 앞머리, 얼빡, luckydraws' },
+{ id: '188', name: 'RUDE! 지우 점프업', album: 'RUDE!', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-0aa81fe623d34e639a4ab4e0651c881c.r2.dev/%EB%A3%A8%EB%93%9C%20%EC%A0%90%ED%94%84%EC%97%85%20%EB%9F%AD%EB%93%9C.jpg', info: '루드, 앞머리, 턱받침, jumpup, 윙크, 얼빡, luckydraws' },
+{ id: '189', name: 'RUDE! 지우 케이타운포유 1.0', album: 'RUDE!', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-0aa81fe623d34e639a4ab4e0651c881c.r2.dev/%EB%A3%A8%EB%93%9C%20%EC%BC%80%ED%83%80%ED%8F%AC%20%EB%9F%AD%EB%93%9C.jpg', info: '루드, 앞머리, ktown4u, 딸기, luckydraws' },
+{ id: '190', name: 'RUDE! 지우 엔와이뮤직', album: 'RUDE!', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-0aa81fe623d34e639a4ab4e0651c881c.r2.dev/%EB%A3%A8%EB%93%9C%20%EC%97%94%EC%99%80%EC%9D%B4%EB%AE%A4%EC%A7%81%20%EB%9F%AD%EB%93%9C.jpg', info: '루드, nymusic, luckydraws, 앞머리, 머리' },
+{ id: '191', name: 'RUDE! 지우 에셈타운', album: 'RUDE!', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-0aa81fe623d34e639a4ab4e0651c881c.r2.dev/%EB%A3%A8%EB%93%9C%20%EC%97%90%EC%85%88%ED%83%80%EC%9A%B4%20%EB%9F%AD%EB%93%9C.jpg', info: '루드, luckydraws, smtown, 앙, 앞머리, 브이' },
+{ id: '192', name: 'RUDE! 지우 애플뮤직 2.0', album: 'RUDE!', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-0aa81fe623d34e639a4ab4e0651c881c.r2.dev/%EB%A3%A8%EB%93%9C%20%EC%95%A0%ED%94%8C%EB%AE%A4%EC%A7%81%20%EB%9F%AD%EB%93%9C%202.0.jpg', info: '루드, applemusic, luckydraws, 앞머리, 브이' },
+{ id: '193', name: 'RUDE! 지우 헬로라이브 2.0', album: 'RUDE!', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-0aa81fe623d34e639a4ab4e0651c881c.r2.dev/%EB%A3%A8%EB%93%9C%20%ED%97%AC%EB%A1%9C%EB%9D%BC%EC%9D%B4%EB%B8%8C%20%EB%9F%AD%EB%93%9C%202.0.jpg', info: '루드, hellolive, luckydraws, 손, 앞머리' },
+{ id: '194', name: 'RUDE! 지우 케이타운포유 2.0', album: 'RUDE!', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-0aa81fe623d34e639a4ab4e0651c881c.r2.dev/%EB%A3%A8%EB%93%9C%20%EC%BC%80%ED%83%80%ED%8F%AC%20%EB%9F%AD%EB%93%9C%202.0.jpg', info: '루드, ktown4u, luckydraws, 앞머리, 핫도그' },
+{ id: '195', name: 'The Chase 지우 에이치엠브이 온라인', album: 'The Chase', category: '예판 특전', fsType: '대면', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20hmv%20online.jpg', info: '앞머리, 더체이스, Hmv Online' },
+{ id: '196', name: 'The Chase 지우 에이치엠브이 온라인', album: 'The Chase', category: '예판 특전', fsType: '대면', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20hmvonline%20%EB%8B%A8%EC%B2%B4.jpg', info: '앞머리, 더체이스, Hmv Online, 단체포카' },
+{ id: '197', name: 'The Chase 지우 에이치엠브이 오프라인', album: 'The Chase', category: '예판 특전', fsType: '대면', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20hmvoffline%20%EB%8B%A8%EC%B2%B4.jpg', info: '앞머리, 더체이스, Hmv Offline, 단체포카' },
+{ id: '198', name: 'The Chase 지우 에이치엠브이 오프라인', album: 'The Chase', category: '예판 특전', fsType: '대면', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20hmvoffline.jpg', info: '앞머리, 더체이스, Hmv Offine, 핀, 손' },
+{ id: '199', name: 'The Chase 지우 케이엠스테이션 2.0', album: 'The Chase', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20kmstation%20%EB%8C%80%EB%A9%B4%202.0%201.jpg', info: '더체이스, 팬싸, kmstation, 안경, 볼콕' },
+{ id: '200', name: 'The Chase 지우 케이엠스테이션 2.0', album: 'The Chase', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20kmstation%20%EB%8C%80%EB%A9%B4%202.0%202.jpg', info: '더체이스, 안경, 메롱, kmstation, 윙크' },
+{ id: '201', name: 'The Chase 지우 케이엠스테이션 폴라 2.0', album: 'The Chase', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20kmstation%20%EB%8C%80%EB%A9%B4%20%ED%8F%B4%EB%9D%BC%202.0%202.jpg', info: '더체이스, kmstation, 안경, 턱받침, 팬싸, 폴라포카' },
+{ id: '202', name: 'The Chase 지우 케이엠스테이션 폴라 2.0', album: 'The Chase', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20kmstation%20%EB%8C%80%EB%A9%B4%20%ED%8F%B4%EB%9D%BC%202.0%201.jpg', info: '더체이스, kmstation, 안경, 턱받침, 팬싸, 폴라포카' },
+{ id: '203', name: 'The Chase 지우 케이엠스테이션 폴라 3.0', album: 'The Chase', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20kmstation%20%EB%8C%80%EB%A9%B4%203.0%20%ED%8F%B4%EB%9D%BC%201.jpg', info: '더체이스, kmstation, 강아지귀, 팬싸, 폴라포카' },
+{ id: '204', name: 'The Chase 지우 케이엠스테이션 폴라 3.0', album: 'The Chase', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20kmstation%20%EB%8C%80%EB%A9%B4%203.0%20%ED%8F%B4%EB%9D%BC%202.jpg', info: '더체이스, kmstation, 턱받침, 팬싸, 폴라포카' },
+{ id: '205', name: 'The Chase 지우 케이엠스테이션 3.0', album: 'The Chase', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20kmastation%20%EB%8C%80%EB%A9%B4%203.0%201.jpg', info: '더체이스, 팬싸, kmstation, 볼하트' },
+{ id: '206', name: 'The Chase 지우 케이엠스테이션 3.0', album: 'The Chase', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20kmastation%20%EB%8C%80%EB%A9%B4%203.0%203.jpg', info: '더체이스, 쇄골, kmstation, 팬싸' },
+{ id: '207', name: 'The Chase 지우 케이엠스테이션 3.0', album: 'The Chase', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20kmastation%20%EB%8C%80%EB%A9%B4%203.0%202.jpg', info: '더체이스, 쇄골, 강아지귀, kmstation' },
+{ id: '208', name: 'The Chase 지우 핫트랙스', album: 'The Chase', category: '예판 특전', fsType: '대면', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%ED%95%AB%ED%8A%B8%EB%9E%99%EC%8A%A4%20%EB%8C%80%EB%A9%B4.jpg', info: '더체이스, hottracks, 홀로그램포카' },
+{ id: '209', name: 'The Chase 지우 트레이딩 카드', album: 'MD 포카', category: 'The Chase', fsType: '대면', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%ED%8A%B8%EB%A0%88%EC%9D%B4%EB%94%A9%20%EC%B9%B4%EB%93%9C%20%EC%97%A0%EB%94%94.jpg', info: '더체이스, tradingcards, 볼펜' },
+{ id: '210', name: 'The Chase 지우 홀로그램', album: 'MD 포카', category: 'The Chase', fsType: '대면', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%ED%99%80%EB%A1%9C%EA%B7%B8%EB%9E%A8%20%EC%97%A0%EB%94%94.jpg', info: '더체이스, tradingcards, 냉미녀, 턱받침' },
+{ id: '211', name: 'The Chase 지우 케이엠에스테이션 1.0', album: 'The Chase', category: '팬싸 특전', fsType: '영통', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20kmstation%20%EC%98%81%ED%86%B5%201.0.jpg', info: '더체이스, kmstation, 볼하트' },
+{ id: '212', name: 'The Chase 지우 이즈위 1.0', album: 'The Chase', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%9D%B4%EC%A6%88%EC%9C%84%20%EB%8C%80%EB%A9%B4%201.0.jpg', info: '더체이스, yzy, 브이' },
+{ id: '213', name: '지우 티니핑 포카홀더', album: 'MD 포카', category: '티니핑', version: 'Package Ver.', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%EA%B8%B0%ED%83%80%20%ED%8B%B0%EB%8B%88%ED%95%91%20%ED%8F%AC%EC%B9%B4%ED%99%80%EB%8D%94.jpg', info: 'teeniping, 윙크, 턱받침' },
+{ id: '214', name: '지우 티니핑 리워드', album: 'MD 포카', category: '티니핑', version: 'Package Ver.', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%ED%8B%B0%EB%8B%88%ED%95%91%20%EB%A6%AC%EC%9B%8C%EB%93%9C.jpg', info: 'teeniping, 교복, 넥타이' },
+{ id: '215', name: '지우 티니핑 트레이딩카드', album: 'MD 포카', category: '티니핑', version: 'Package Ver.', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%ED%8B%B0%EB%8B%88%ED%95%91%20%ED%8A%B8%EB%A0%88%EC%9D%B4%EB%94%A9%EC%B9%B4%EB%93%9C.jpg', info: 'teeniping, 핀, 윙크, 볼하트' },
+{ id: '216', name: 'The Chase 지우 케이엠스테이션 1.0', album: 'The Chase', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20kmstation%20%EB%8C%80%EB%A9%B4%201.0.jpg', info: '더체이스, kmstation, 얼빡, 윙크' },
+{ id: '217', name: 'The Chase 지우 케이엠스테이션 4.0', album: 'The Chase', category: '팬싸 특전', fsType: '영통', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%EC%9D%B4%EC%8A%A4%20kmstation%20%EC%98%81%ED%86%B5%204.0.jpg', info: '더체이스, 턱받침, kmstation' },
+{ id: '218', name: '지우 에스엠타운 도쿄', album: '기타', category: 'SMT 25', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%EC%97%90%EC%85%88%ED%83%80%EC%9A%B4%20%EB%8F%84%EC%BF%84%EB%9E%9C%EB%8D%A4.jpg', info: 'smtowntokyo, 쇄골' },
+{ id: '219', name: 'FOCUS 지우 스타리버 5.0', album: 'FOCUS', category: '팬싸 특전', fsType: '영통', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%8A%A4%ED%83%80%EB%A6%AC%EB%B2%84%20%EC%98%81%ED%86%B5%205.0.jpg', info: '포커스, starriver, 볼하트, 얼빡' },
+{ id: '220', name: 'FOCUS 지우 스타리버 폴라 5.0', album: 'FOCUS', category: '팬싸 특전', fsType: '영통', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%8A%A4%ED%83%80%EB%A6%AC%EB%B2%84%20%ED%8F%B4%EB%9D%BC%205.0.jpg', info: '포커스, starriver, 폴라포카, 앙' },
+{ id: '221', name: '지우 데뷔 쇼케이스', album: '기타', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%EC%97%90%EC%85%88%20%EB%8D%B0%EB%B7%94%EC%87%BC%EC%BC%80.jpg', info: 'debutinvite, 턱받침' },
+{ id: '222', name: 'STYLE 지우 큐큐뮤직 1성', album: 'STYLE', category: '럭키드로우', fsType: '럭키드로우', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20qq%EB%AE%A4%EC%A7%81%201%EC%84%B1.jpg', info: '스타일, qqmusic, 포즈, 앞머리' },
+{ id: '223', name: 'STYLE 지우 에코백', album: 'MD 포카', category: 'STYLE', version: 'Package Ver.', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20md%20%EC%97%90%EC%BD%94%EB%B0%B1.jpg', info: 'style, 안경, 윙크, 엣지' },
+{ id: '224', name: 'STYLE 지우 큐큐뮤직 2성', album: 'STYLE', category: '럭키드로우', fsType: '럭키드로우', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20qq%EB%AE%A4%EC%A7%81%202%EC%84%B1.jpg', info: '스타일, qqmusic, 턱받침, 머리먹음' },
+{ id: '225', name: 'STYLE 지우 큐큐뮤직 5성', album: 'STYLE', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20qq%EB%AE%A4%EC%A7%81%205%EC%84%B1.jpg', info: '스타일, qqmusic, 브이, 혀빼꼼' },
+{ id: '226', name: 'The Chase 지우 타워레코드 온라인', album: 'The Chase', category: '예판 특전', fsType: '대면', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%EC%9D%B4%EC%8A%A4%20%ED%83%80%EC%9B%8C%EB%A0%88%EC%BD%94%EB%93%9C%20%EC%98%A8%EB%9D%BC%EC%9D%B8.jpg', info: '앞머리, 더체이스, towerrecordsonline, 빨간옷, 앙' },
+{ id: '227', name: 'The Chase 지우 트레이딩카드', album: 'MD 포카', category: '티니핑', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%EC%9D%B4%EC%8A%A4%20%EC%97%A0%EB%94%94%20%ED%8A%B8%EB%A0%88%EC%9D%B4%EB%94%A9%EC%B9%B4%EB%93%9C.jpg', info: '더체이스, 윙크, 브이, 엠디포카, tradingcard' },
+{ id: '228', name: 'STYLE 지우 큐큐뮤직 4성', album: 'STYLE', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20qq%EB%AE%A4%EC%A7%81%204%EC%84%B1.jpg', info: '스타일, qqmusic, 교복, 넥타이' },
+{ id: '229', name: '지우 포하츠클럽 트레이딩카드', album: 'MD 포카', category: 'Four Hearts Club', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/four%20hears%20club%20%ED%8A%B8%EB%A0%88%EC%9D%B4%EB%94%A9%20%ED%8F%AC%EC%B9%B42.jpg', info: 'four heart club, 셔츠, 턱받침' },
+{ id: '230', name: '지우 포하츠클럽 트레이딩카드', album: 'MD 포카', category: 'Four Hearts Club', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/four%20hears%20club%20%ED%8A%B8%EB%A0%88%EC%9D%B4%EB%94%A9%20%ED%8F%AC%EC%B9%B41.jpg', info: 'four hearts club, 셔츠, 볼콕, 윙크' },
+{ id: '231', name: '지우 포하츠클럽 파우치', album: 'MD 포카', category: 'Four Hearts Club', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/four%20hears%20club%20%ED%8C%8C%EC%9A%B0%EC%B9%98%20%ED%8F%AC%EC%B9%B4.jpg', info: 'four hearts club, 셔츠, 증명사진' },
+{ id: '232', name: '지우 베어앤블리스', album: '기타', category: 'BARENBLISS', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/barenbliss.jpg', info: 'barenbliss, 윙크, 앙, 머리띠, 잔머리' },
+{ id: '233', name: '지우 슈퍼스타 에스엠 토론토', album: '기타', category: 'SUPER STAR SM', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/superstarsm%20%ED%86%A0%EB%A1%A0%ED%86%A0.jpg', info: 'superstarsm, ssm, 슈스엠, 윙크, 홀로그램, 앞머리' },
+{ id: '234', name: '지우 투에이앤', album: '기타', category: '2aN', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/2an%20%ED%8F%AC%EC%B9%B4.jpg', info: '2an, 혀, 메롱' },
+{ id: '235', name: '지우 에스엠타운 도쿄', album: '기타', category: 'SMT 25', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%EC%97%90%EC%85%88%ED%83%80%EC%9A%B4%20%EB%9D%BC%EC%9D%B4%EB%B8%8C%20%EB%8F%84%EC%BF%84%20%EC%BB%A8%EC%85%89.jpg', info: 'smtowntokyo, 포즈, 냉쮸' },
+{ id: '236', name: '지우 에스엠타운 도쿄', album: '기타', category: 'SMT 25', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%EC%97%90%EC%85%88%ED%83%80%EC%9A%B4%20%EB%9D%BC%EC%9D%B4%EB%B8%8C%20%EB%8F%84%EC%BF%84%20%EA%B5%AC%EB%A7%A4%20%ED%98%9C%ED%83%9D.jpg', info: 'smtowntokyo, 목걸이, 파란옷' },
+{ id: '237', name: '지우 에스엠타운 도쿄 큐큐뮤직', album: '기타', category: 'SMT 25', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%EC%97%90%EC%85%88%ED%83%80%EC%9A%B4%EB%9D%BC%EC%9D%B4%EB%B8%8C%20qq%EB%AE%A4%EC%A7%81%201.jpg', info: 'smtowntokyo, qqmusic, 냉쮸, 턱받침, 후드' },
+{ id: '238', name: '지우 에스엠타운 도쿄 큐큐뮤직', album: '기타', category: 'SMT 25', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%EC%97%90%EC%85%88%ED%83%80%EC%9A%B4%EB%9D%BC%EC%9D%B4%EB%B8%8C%20%ED%81%90%ED%81%90%EB%AE%A4%EC%A7%812.jpg', info: 'smtowntokyo, qqmusic, 냉쮸, 3, 삼, 파란옷' },
+{ id: '239', name: '지우 에스엠타운 도쿄 7만원 이상', album: '기타', category: 'SMT 25', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%EC%97%90%EC%85%88%ED%83%80%EC%9A%B4%EB%9D%BC%EC%9D%B4%EB%B8%8C%20%EB%B2%A0%EB%84%A4%ED%95%8F.jpg', info: 'smtowntokyo, 볼콕, 홀터넥, 윙크, 냉쮸' },
+{ id: '240', name: '지우 메가 커피', album: '기타', category: '메가 커피', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%EB%A9%94%EA%B0%80%EC%BB%A4%ED%94%BC%202.jpg', info: 'megacoffee, 안경, 반깐, 치마' },
+{ id: '241', name: '지우 메가 커피', album: '기타', category: '메가 커피', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%EB%A9%94%EA%B0%80%EC%BB%A4%ED%94%BC%201.jpg', info: 'megacoffee, 턱받침, 쇄골, 흰색' },
+{ id: '242', name: 'The Chase 지우 Package Ver.', album: '유닛 포카', category: 'The Chase', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%EC%9D%B4%EC%8A%A4%20%ED%8C%A8%ED%82%A4%EC%A7%80%20%EB%B2%84%EC%A0%84.jpg', info: '더체이스, 앞머리, 초록색, 앙, 스텔라, 카르멘, stella, carmen, 하늘' },
+{ id: '243', name: 'STYLE 지우 큐큐뮤직 3성', album: 'STYLE', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%ED%81%90%ED%81%90%EB%AE%A4%EC%A7%81%203%EC%84%B1.jpg', info: '스타일, qqmusic, 브이, 핀, 윙크, 후드집업' },
+{ id: '244', name: 'STYLE 지우 콜렉트북', album: 'MD 포카', category: 'STYLE', version: 'Package Ver.', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EC%BD%9C%EB%A0%89%ED%8A%B8%EB%B6%81%202.png', info: 'style, 손, 쇄골, 윙크, 엣지' },
+{ id: '245', name: 'The Chase 지우 비즈스트랩', album: 'MD 포카', category: 'The Chase', fsType: '영통', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%EB%B9%84%EC%A6%88%20%EC%8A%A4%ED%8A%B8%EB%9E%A9.webp', info: '더체이스, 볼콕, 손' },
+{ id: '246', name: 'The Chase 지우 손거울', album: 'MD 포카', category: 'The Chase', fsType: '영통', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%EC%86%90%EA%B1%B0%EC%9A%B8.jpg', info: '더체이스, 니트' },
+{ id: '247', name: 'The Chase 지우 트레이딩카드', album: 'MD 포카', category: 'The Chase', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20%ED%8A%B8%EB%A0%88%EC%9D%B4%EB%94%A9%20%EC%B9%B4%EB%93%9C.jpg', info: '더체이스, 볼펜, 엠디포카, tradingcard' },
+{ id: '248', name: '지우 포하츠클럽 시크릿다이어리', album: 'MD 포카', category: 'Four Hearts Club', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/four%20hearts%20club%20%EC%8B%9C%ED%81%AC%EB%A6%BF%EB%8B%A4%EC%9D%B4%EC%96%B4%EB%A6%AC.jpg', info: 'fourheartsclub, 셔츠, secretdiary, 볼하트, 앞머리' },
+{ id: '249', name: '지우 포하츠클럽 스크런치', album: 'MD 포카', category: 'Four Hearts Club', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/four%20hearts%20club%20%EC%8A%A4%ED%81%AC%EB%9F%B0%EC%B9%98.jpg', info: 'four hearts club, 셔츠, 앞머리, 턱받침, 홀로그램' },
+{ id: '250', name: '지우 포하츠클럽 가방', album: 'MD 포카', category: 'Four Hearts Club', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/four%20hearts%20club%20%EA%B0%80%EB%B0%A9.jpg', info: 'four hearts club, 셔츠, 앞머리, 냉쮸' },
+{ id: '251', name: '지우 포하츠클럽 트레이딩카드', album: '유닛 포카', category: '기타', version: 'Package Ver.', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/four%20hearts%20club%20%EC%9C%A0%EB%8B%9B%ED%8F%AC%EC%B9%B41.jpg', info: 'fourheartsclub, 유하, yuha, 밀크즈, 볼콕, 윙크, 앞머리, jiwoo' },
+{ id: '252', name: '지우 포하츠클럽 트레이딩카드', album: '유닛 포카', category: '기타', version: 'Package Ver.', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/four%20heats%20club%20%EC%9C%A0%EB%8B%9B%ED%8F%AC%EC%B9%B42.jpg', info: 'fourheartsclub, 주은, juun, ian, 이안, 브이, 셔츠, jiwoo' },
+{ id: '253', name: 'FOCUS 지우 트레이딩카드 B', album: 'MD 포카', category: 'FOCUS', version: 'Package Ver.', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%ED%8A%B8%EB%A0%88%EC%9D%B4%EB%94%A9%EC%B9%B4%EB%93%9C%20b%201.jpg', info: '포커스, 볼하트, 윙크, 엠디포카, tradingcardb' },
+{ id: '254', name: 'FOCUS 지우 트레이딩카드 A', album: 'MD 포카', category: 'FOCUS', version: 'Package Ver.', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%ED%8A%B8%EB%A0%88%EC%9D%B4%EB%94%A9%20a.jpg', info: '포커스, 홀로그램, 잔머리, 턱끝, 엠디포카, tradingcarda' },
+{ id: '255', name: 'FOCUS 지우 트레이딩카드 A', album: 'MD 포카', category: 'FOCUS', version: 'Package Ver.', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%ED%8A%B8%EB%A0%88%EC%9D%B4%EB%94%A9%20a%202.jpg', info: '포커스, 홀로그램, 잔머리, 턱받침, 엠디포카, tradingcarda' },
+{ id: '256', name: 'FOCUS 지우 트레이딩카드 B', album: 'MD 포카', category: 'FOCUS', version: 'Package Ver.', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%ED%8A%B8%EB%A0%88%EC%9D%B4%EB%94%A9%20b%202.jpg', info: '포커스, 턱받침, 엠디포카, tradingcardb' },
+{ id: '257', name: 'FOCUS 지우 포토세트', album: 'MD 포카', category: 'FOCUS', version: 'Package Ver.', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%ED%8F%AC%ED%86%A0%20%EC%84%B8%ED%8A%B8%201.jpg', info: '포커스, 고양이귀, 잔머리, 쇄골, 엠디포카, photoset' },
+{ id: '258', name: 'FOCUS 지우 포토세트', album: 'MD 포카', category: 'FOCUS', version: 'Package Ver.', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%ED%8F%AC%ED%86%A0%20%EC%84%B8%ED%8A%B8%202.jpg', info: '포커스, 옆태, 잔머리, 엠디포카, photoset' },
+{ id: '259', name: 'STYLE 지우 큐큐뮤직 단체', album: 'STYLE', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20qq%EB%AE%A4%EC%A7%81%20%EB%8B%A8%EC%B2%B4.jpg', info: '스타일, qqmusic, 단체' },
+{ id: '260', name: 'STYLE 지우 콜렉트북', album: 'MD 포카', category: 'STYLE', version: 'Package Ver.', imgUrl: 'https://pub-fb0a7bcdbfef44e69892e326c62f30e6.r2.dev/%EC%8A%A4%ED%83%80%EC%9D%BC%20%EC%BD%9C%EB%A0%89%ED%8A%B8%EB%B6%81%202.jpg', info: 'style, 고양이, 윙크, 앞머리' },
+{ id: '261', name: '지우 에스엠타운 도쿄 슈퍼스타 에스엠', album: '기타', category: 'SUPER STAR SM', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%EC%8A%88%EC%8A%A4%EC%97%A0%20%EB%8F%84%EC%BF%84.jpg', info: 'smtowntokyo, 홀로그램, superstarsm, ssm, 슈스엠' },
+{ id: '262', name: '지우 슈퍼스타 에스엠 써머페스타', album: '기타', category: 'SUPER STAR SM', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%EC%8A%88%EC%8A%A4%EC%97%A0%20%EC%8D%A8%EB%A8%B8%ED%8E%98%EC%8A%A4%ED%83%80.jpg', info: 'smtownsummerfesta, 홀로그램, superstarsm, ssm, 슈스엠' },
+{ id: '263', name: '지우 2026 시즌그리팅', album: 'MD 포카', category: '시즌그리팅', version: 'Package Ver.', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/2026%20%EC%8B%9C%EA%B7%B8.jpg', info: 'seasongreetings, 잔머리, 엠디포카, 빼꼼' },
+{ id: '264', name: '지우 2026 시즌그리팅', album: 'MD 포카', category: '시즌그리팅', version: 'Package Ver.', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/2026%20%EC%8B%9C%EA%B7%B8%202.jpg', info: 'seasongreetings, 엠디포카, 얼빡, 점' },
+{ id: '265', name: '지우 2026 시즌그리팅 에스엠타운', album: 'MD 포카', category: '시즌그리팅', version: 'Package Ver.', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/2026%20%EC%8B%9C%EA%B7%B8%20%EC%97%90%EC%85%88%ED%83%80%EC%9A%B4.jpg', info: 'seasongreetings, 엠디포카, smtown, 옆태' },
+{ id: '266', name: '지우 2026 시즌그리팅 케이타운포유', album: 'MD 포카', category: '시즌그리팅', version: 'Package Ver.', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/2026%20%EC%8B%9C%EA%B7%B8%20%EC%BC%80%ED%83%80%ED%8F%AC.jpg', info: 'seasongreetings, 엠디포카, ktown4u, 턱받침, 잔머리' },
+{ id: '267', name: '지우 2026 시즌그리팅 위드뮤', album: 'MD 포카', category: '시즌그리팅', version: 'Package Ver.', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%EC%8B%9C%EA%B7%B8%202026%20%EC%9C%84%EB%93%9C%EB%AE%A4.jpg', info: 'seasongreetings, 엠디포카, withmuu, 잔머리' },
+{ id: '268', name: '지우 2026 시즌그리팅 예스24', album: 'MD 포카', category: '시즌그리팅', version: 'Package Ver.', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/2026%20%EC%8B%9C%EA%B7%B8%20%EC%98%88%EC%82%AC.jpg', info: 'seasongreetings, 엠디포카, yes24, 잔머리, 아기' },
+{ id: '269', name: '지우 2026 시즌그리팅 트레이딩카드', album: 'MD 포카', category: '시즌그리팅', version: 'Package Ver.', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/2026%20%EC%8B%9C%EA%B7%B8%20%ED%8A%B8%EC%B9%B4%201.jpg', info: 'seasongreetings, 트레카, tradingcards, 보자기, 아기' },
+{ id: '270', name: '지우 2026 시즌그리팅 트레이딩카드', album: 'MD 포카', category: '시즌그리팅', version: 'Package Ver.', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/2026%20%EC%8B%9C%EA%B7%B8%20%ED%8A%B8%EB%A0%88%EC%B9%B4%202.jpg', info: 'seasongreetings, 트레카, tradingcards, 보자기, 잔머리' },
+{ id: '271', name: '지우 2026 시즌그리팅 트레이딩카드', album: 'MD 포카', category: '시즌그리팅', version: 'Package Ver.', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/2026%20%EC%8B%9C%EA%B7%B8%20%ED%8A%B8%EB%A0%88%EC%B9%B4%203.jpg', info: 'seasongreetings, 트레카, tradingcards, 보자기, 잔머리' },
+{ id: '272', name: '지우 2026 시즌그리팅 트레이딩카드', album: 'MD 포카', category: '시즌그리팅', version: 'Package Ver.', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/2026%20%EC%8B%9C%EA%B7%B8%20%ED%8A%B8%EB%A0%88%EC%B9%B4%204.jpg', info: 'seasongreetings, 트레카, tradingcards, 보자기, 잔머리, 옆태' },
+{ id: '273', name: '지우 2026 시즌그리팅 트레이딩카드', album: 'MD 포카', category: '시즌그리팅', version: 'Package Ver.', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/2026%20%EC%8B%9C%EA%B7%B8%20%ED%8A%B8%EB%A0%88%EC%B9%B4%205.jpg', info: 'seasongreetings, 트레카, tradingcards, 잔머리' },
+{ id: '274', name: '지우 2026 시즌그리팅 트레이딩카드', album: 'MD 포카', category: '시즌그리팅', version: 'Package Ver.', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/2026%20%EC%8B%9C%EA%B7%B8%20%ED%8A%B8%EB%A0%88%EC%B9%B4%206.jpg', info: 'seasongreetings, 트레카, tradingcards, 잔머리, 볼점' },
+{ id: '275', name: '지우 2026 시즌그리팅 포토팩', album: 'MD 포카', category: '시즌그리팅', version: 'Package Ver.', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/2026%20%EC%8B%9C%EA%B7%B8%20%ED%8F%AC%ED%86%A0%ED%8C%A9.jpg', info: 'seasongreetings, photopack, 잔머리, 보자기' },
+{ id: '276', name: '지우 2026 시즌그리팅 포토팩', album: 'MD 포카', category: '시즌그리팅', version: 'Package Ver.', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/2026%20%EC%8B%9C%EA%B7%B8%20%ED%8F%AC%ED%86%A0%ED%8C%A9%202.jpg', info: 'seasongreetings, photopack, 잔머리, 볼하트' },
+{ id: '277', name: 'FOCUS 지우 큐큐뮤직 1성', album: 'FOCUS', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%ED%81%90%ED%81%90%EB%AE%A4%EC%A7%81%201%EC%84%B1.jpg', info: '포커스, qqmusic, 교복, 넥타이, 옆태' },
+{ id: '278', name: 'FOCUS 지우 큐큐뮤직 2성', album: 'FOCUS', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%ED%81%90%ED%81%90%EB%AE%A4%EC%A7%81%202%EC%84%B1.jpg', info: '포커스, qqmusic, 턱받침' },
+{ id: '279', name: 'FOCUS 지우 큐큐뮤직 3성', album: 'FOCUS', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%ED%81%90%ED%81%90%EB%AE%A4%EC%A7%81%203%EC%84%B1.jpg', info: '포커스, qqmusic, 사과머리' },
+{ id: '280', name: 'FOCUS 지우 큐큐뮤직 4성', album: 'FOCUS', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%ED%81%90%ED%81%90%EB%AE%A4%EC%A7%81%204%EC%84%B1.jpg', info: '포커스, qqmusic, 잔머리, 여신' },
+{ id: '281', name: 'FOCUS 지우 큐큐뮤직 5성', album: 'FOCUS', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%ED%81%90%ED%81%90%EB%AE%A4%EC%A7%81%205%EC%84%B1.jpg', info: '포커스, qqmusic, 집업, 링귀걸이' },
+{ id: '282', name: '지우 릴리브라운', album: '기타', category: 'LILY BROWN', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%EB%A6%B4%EB%A6%AC%EB%B8%8C%EB%9D%BC%EC%9A%B4.jpg', info: 'lilybrown, , 볼하트' },
+{ id: '283', name: 'FOCUS 지우 티셔츠', album: 'MD 포카', category: 'FOCUS', version: 'Package Ver.', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%97%A0%EB%94%94%20%ED%8B%B0%EC%85%94%EC%B8%A0.jpg', info: '엠디포카, tshirts, 브이, 반묶음' },
+{ id: '284', name: 'FOCUS 지우 후드집업', album: 'MD 포카', category: 'FOCUS', version: 'Package Ver.', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EC%97%A0%EB%94%94%20%ED%9B%84%EB%93%9C%EC%A7%91%EC%97%85.jpg', info: '엠디포카, sweatshirt, 볼찌빵, 앙, 윙크, 반묶음' },
+{ id: '285', name: '지우 국민은행', album: '기타', category: '국민은행', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%EA%B5%AD%EB%AF%BC%EC%9D%80%ED%96%89.jpg', info: 'kookminbank, 볼하트, 윙크' },
+{ id: '286', name: '지우 투에이앤', album: '기타', category: '2aN', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%ED%88%AC%EC%97%90%EC%9D%B4%EC%95%A4.jpg', info: '2an, 뀨, 몇가닥, 입술' },
+{ id: '287', name: '지우 2026 시즌그리팅 위버스코리아', album: 'MD 포카', category: '시즌그리팅', version: 'Package Ver.', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%EC%8B%9C%EA%B7%B8%202026%20%EC%9C%84%EB%B2%84%EC%8A%A4%EC%BD%94%EB%A6%AC%EC%95%84.jpg', info: 'seasongreetings, 잔머리, 턱받침' },
+{ id: '288', name: '지우 Hearts2House 트레이딩카드', album: 'MD 포카', category: 'Hearts2House', version: 'Package Ver.', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/hearts2house%20%ED%8A%B8%EB%A0%88%EC%B9%B4.jpg', info: '팬미팅, 트레카, tradingcards, 엠디포카, 얼빡, 앙, 셔츠 교복' },
+{ id: '289', name: '지우 Hearts2House 트레이딩카드', album: 'MD 포카', category: 'Hearts2House', version: 'Package Ver.', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/hearts2house%20%ED%8A%B8%EB%A0%88%EC%B9%B42.jpg', info: '팬미팅, 트레카, tradingcards, 엠디포카, 셔츠, 교복, 쉿' },
+{ id: '290', name: '지우 응원봉', album: 'MD 포카', category: '응원봉', version: 'Package Ver.', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%EC%9D%91%EC%9B%90%EB%B4%89.jpg', info: '팬미팅, 셔츠, 교복, 윙크' },
+{ id: '291', name: '지우 Hearts2House 캔들', album: 'MD 포카', category: 'Hearts2House', version: 'Package Ver.', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/hearts2house%20%EC%BA%94%EB%93%A4.jpg', info: '팬미팅, 엠디포카, 셔츠, 교복, 브이, 혀빼꼼' },
+{ id: '292', name: '지우 에스엠 30주년', album: '기타', category: 'SM 30th', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%EC%97%90%EC%8A%A4%EC%97%A0%2030%EC%A3%BC%EB%85%84.jpg', info: 'smtown, 잔머리, 인이어, 갈발' },
+{ id: '293', name: '지우 2026 시즌그리팅 트레이딩카드', album: 'MD 포카', category: '시즌그리팅', version: 'Package Ver.', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/2026%20%EC%8B%9C%EA%B7%B8%20%ED%8A%B8%EB%A0%88%EC%B9%B4%207.jpg', info: 'seasongreetings, 트레카, tradingcards, 잔머리, 빼꼼, 까꿍' },
+{ id: '294', name: '지우 Hearts2House 머플러', album: 'MD 포카', category: 'Hearts2House', version: 'Package Ver.', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/hearts2house%20%EB%A8%B8%ED%94%8C%EB%9F%AC.jpg', info: '팬미팅, 엠디포카, 셔츠, 교복, 여친짤, 앞머리, 목도리' },
+{ id: '295', name: '지우 2026 시즌그리팅 트레이딩카드', album: 'MD 포카', category: '시즌그리팅', version: 'Package Ver.', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/2026%20%EC%8B%9C%EA%B7%B8%20%ED%8A%B8%EB%A0%88%EC%B9%B4%208.jpg', info: 'seasongreetings, 트레카, tradingcards, 잔머리, 옆태' },
+{ id: '296', name: '지우 Hearts2House 맨투맨', album: 'MD 포카', category: 'Hearts2House', version: 'Package Ver.', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/hearts2house%20%EB%A7%A8%ED%88%AC%EB%A7%A8.jpg', info: '팬미팅, 엠디포카, 셔츠, 교복, 여친짤, 앞머리, 볼, 앙, 볼찌빵' },
+{ id: '297', name: '지우 2026 시즌그리팅 뮤직앤드라마 폴라', album: 'MD 포카', category: '시즌그리팅', version: 'Package Ver.', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/2026%20%EC%8B%9C%EA%B7%B8%20%EB%AE%A4%EC%A7%81%EC%95%A4%EB%93%9C%EB%9D%BC%EB%A7%88.jpg', info: 'seasongreetings, 폴라포카, 잔머리, 턱받침' },
+{ id: '298', name: 'The Chase 지우 케이엠스테이션 3.0', album: 'The Chase', category: '팬싸 특전', fsType: '영통', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20kmstation%20%EC%98%81%ED%86%B5%203.0.jpg', info: '더체이스, kmstation, 브이, 윙크, 깐머리' },
+{ id: '299', name: 'RUDE 지우 큐큐뮤직 4성', album: 'RUDE!', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-59d385dbb45942d9b7b27b48f5c9c818.r2.dev/%EB%A3%A8%EB%93%9C%20%ED%81%90%ED%81%90%EB%AE%A4%EC%A7%81%204%EC%84%B1.jpg', info: '루드, qqmusic, 앞머리, 윙크' },
+{ id: '300', name: 'RUDE 지우 큐큐뮤직 3성', album: 'RUDE!', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-59d385dbb45942d9b7b27b48f5c9c818.r2.dev/%EB%A3%A8%EB%93%9C%20%ED%81%90%ED%81%90%EB%AE%A4%EC%A7%81%203%EC%84%B1.jpg', info: '루드, qqmusic, 앞머리, 셔츠' },
+{ id: '301', name: 'FOCUS 지우 방콕', album: 'FOCUS', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EB%B0%A9%EC%BD%95%20%EB%8C%80%EB%A9%B4.jpg', info: '포커스, 대면팬싸, 더티워크착, 쇄골, 볼하트' },
+{ id: '302', name: 'FOCUS 지우 방콕 카페 이벤트', album: 'FOCUS', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EB%B0%A9%EC%BD%95%20%EC%B9%B4%ED%8E%98%EC%9D%B4%EB%B2%A4%ED%8A%B8.jpg', info: '포커스, 대면팬싸, 반묶음, 공주' },
+{ id: '303', name: '지우 테레카 2025 케이팝 루키 베이스', album: '기타', category: 'TELECA 2025 KPOP ROOKIE', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%ED%85%8C%EB%A0%88%EC%B9%B4%201.jpg', info: 'teleca, 교복, 리본넥타이' },
+{ id: '304', name: '지우 테레카 2025 케이팝 루키 베이스', album: '기타', category: 'TELECA 2025 KPOP ROOKIE', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%ED%85%8C%EB%A0%88%EC%B9%B4%202.jpg', info: 'teleca, 꽃다발, 나그랑티' },
+{ id: '305', name: '지우 테레카 2025 케이팝 루키 베이스', album: '기타', category: 'TELECA 2025 KPOP ROOKIE', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%ED%85%8C%EB%A0%88%EC%B9%B4%203.jpg', info: 'teleca, 아궁빵, 교복, 명찰, 잔머리' },
+{ id: '306', name: '지우 테레카 2025 케이팝 루키 베이스', album: '기타', category: 'TELECA 2025 KPOP ROOKIE', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%ED%85%8C%EB%A0%88%EC%B9%B4%204.jpg', info: 'teleca, 나그랑티, 브이, 안경' },
+{ id: '307', name: '지우 테레카 2025 케이팝 루키 베이스', album: '유닛포카', category: '기타', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%ED%85%8C%EB%A0%88%EC%B9%B4%20%EC%9C%A0%EB%8B%9B%201.jpg', info: 'teleca, 나그랑티, 확성기, 안경, stella, karmen, 카르멘, 스텔라, 카우즈, 스타즈' },
+{ id: '308', name: '지우 테레카 2025 케이팝 루키 셀피', album: '유닛포카', category: '기타', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%ED%85%8C%EB%A0%88%EC%B9%B4%20%EC%85%80%ED%94%BC%20%EC%9C%A0%EB%8B%9B%202.jpg', info: 'teleca, 교복, 볼콕, 예온, yeon, 에이나, ana, 쮸햄즈, 에츄즈' },
+{ id: '309', name: '지우 테레카 2025 케이팝 루키 레트로', album: '기타', category: 'TELECA 2025 KPOP ROOKIE', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%ED%85%8C%EB%A0%88%EC%B9%B4%20%EB%A0%88%ED%8A%B8%EB%A1%9C.jpg', info: 'teleca, 교복, 옆태' },
+{ id: '310', name: '지우 테레카 2025 케이팝 루키 스페셜', album: '기타', category: 'TELECA 2025 KPOP ROOKIE', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%ED%85%8C%EB%A0%88%EC%B9%B4%20%EC%8A%A4%ED%8E%98%EC%85%9C.jpg', info: 'teleca, 교복, 안경, 홀로그램, 잔머리' },
+{ id: '311', name: '지우 테레카 2025 케이팝 루키 스케치', album: '기타', category: 'TELECA 2025 KPOP ROOKIE', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%ED%85%8C%EB%A0%88%EC%B9%B4%20%EC%8A%A4%EC%BC%80%EC%B9%98.jpg', info: 'teleca, 교복, 강아지, 책상, 집, istj' },
+{ id: '312', name: '지우 테레카 2025 케이팝 루키 베이스', album: '기타', category: 'TELECA 2025 KPOP ROOKIE', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%ED%85%8C%EB%A0%88%EC%B9%B4%20%EB%8B%A8%EC%B2%B4%201.jpg', info: 'teleca, 단체, 교복' },
+{ id: '313', name: '지우 테레카 2025 케이팝 루키 베이스', album: '기타', category: 'TELECA 2025 KPOP ROOKIE', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%ED%85%8C%EB%A0%88%EC%B9%B4%20%EB%8B%A8%EC%B2%B4%202.jpg', info: 'teleca, 단체, 나그랑티' },
+
+
+
+
+
+
+
+{ id: '199', name: 'The Chase 지우 케이엠스테이션 2.0', album: 'The Chase', category: '팬싸 특전', fsType: '대면', imgUrl: '', info: '더체이스, 안경, 브이' },
+
+
+ ]; 
+let bookmarks = JSON.parse(localStorage.getItem('jiwoo_bookmarks')) || [];
+    let currentAlbum = '';
+    let currentTab = '';
+    let currentVer = '전체';
+    let currentFsType = '전체';
+
+    const menuToggle = document.getElementById('menu-toggle');
+    const tocMenu = document.getElementById('toc-menu');
+    const mainView = document.getElementById('main-view');
+    const menuListContainer = document.getElementById('menu-list-container');
+    const pcList = document.getElementById('pc-list');
+    const searchToggle = document.getElementById('search-toggle');
+    const searchBar = document.getElementById('search-bar');
+    const searchInput = document.getElementById('search-input');
+    const gridRange = document.getElementById('grid-range');
+    const sliderContainer = document.getElementById('grid-slider-container');
+
+    const menuStructure = [
+        { name: '전체', children: [] },
+        { name: 'The Chase', children: ['앨범 포카', '예판 특전', '럭키드로우', '팬싸 특전'] },
+        { name: 'STYLE', children: ['팬싸 특전', '럭키드로우', '기타'] },
+        { name: 'FOCUS', children: ['앨범 포카', '예판 특전', '럭키드로우', '팬싸 특전'] },
+        { name: 'RUDE!', children: ['럭키드로우', '기타'] },
+        { name: '유닛 포카', children: ['The Chase', 'STYLE', 'FOCUS', 'RUDE!', '기타'] },
+        { name: 'MD 포카', children: ['The Chase', 'STYLE', 'FOCUS', '1st ANNIVERSARY', 'Four Hearts Club', '티니핑', '시즌그리팅', 'Hearts2House', '응원봉', 'BIRTHDAY'] },
+        { name: '기타', children: ['메가 커피', 'SUPER STAR SM', 'SMT 25', 'BARENBLISS', '2aN', 'scarlett', 'TELECA 2025 KPOP ROOKIE', 'SM 30th', '국민은행', 'LILY BROWN'] }
+    ];
+
+    // 슬라이더 작동 로직
+gridRange.max = 5; //
+    gridRange.addEventListener('input', (e) => {
+        const val = e.target.value;
+        document.documentElement.style.setProperty('--grid-cols', val);
+        if(val >= 3) pcList.classList.add('grid-3-plus');
+        else pcList.classList.remove('grid-3-plus');
+    });
+
+    function goHome() {
+        tocMenu.style.display = 'none';
+        mainView.style.display = 'block';
+        searchBar.style.display = 'none';
+        sliderContainer.style.display = 'none';
+        document.getElementById('tab-wrapper').style.display = 'flex';
+        menuToggle.querySelector('i').className = 'fas fa-bars';
+        document.getElementById('welcome-view').style.display = 'block';
+        document.getElementById('result-area').style.display = 'none';
+    }
+
+    function renderMenu() {
+        menuListContainer.innerHTML = menuStructure.map((parent, index) => `
+            <div class="menu-group">
+                <div class="menu-parent-row">
+                    <span class="menu-parent-text" onclick="selectAlbum('${parent.name}')">${parent.name}</span>
+                    ${parent.children.length > 0 ? `<div class="toggle-btn" onclick="toggleSubMenu(this, ${index})"><i class="fas fa-chevron-down"></i></div>` : ''}
+                </div>
+                ${parent.children.length > 0 ? `<ul class="menu-child-list" id="submenu-${index}" style="display:none;">${parent.children.map(child => `<li class="menu-child-item" onclick="selectFromMenu('${parent.name}', '${child}')">${child}</li>`).join('')}</ul>` : ''}
+            </div>
+        `).join('');
+    }
+
+    function toggleSubMenu(btn, index) {
+        const submenu = document.getElementById(`submenu-${index}`);
+        const isVisible = submenu.style.display === 'flex';
+        submenu.style.display = isVisible ? 'none' : 'flex';
+        btn.classList.toggle('active', !isVisible);
+    }
+
+    function selectFromMenu(p, c) { selectAlbum(p); changeTab(null, c); }
+
+    function selectAlbum(name) {
+        tocMenu.style.display = 'none';
+        mainView.style.display = 'block';
+        searchBar.style.display = 'none';
+        document.getElementById('tab-wrapper').style.display = 'flex';
+        menuToggle.querySelector('i').className = 'fas fa-bars';
+        document.getElementById('welcome-view').style.display = 'none';
+        document.getElementById('result-area').style.display = 'block';
+        document.getElementById('display-album-name').innerText = name;
+        currentAlbum = name;
+        
+        let tabs = ['전체'];
+        const findMenu = menuStructure.find(m => m.name === name);
+        if (findMenu) tabs = tabs.concat(findMenu.children);
+        document.getElementById('tab-wrapper').innerHTML = tabs.map(t => `<button class="tab-btn" onclick="changeTab(this, '${t}')">${t}</button>`).join('');
+        changeTab(null, '전체');
+    }
+
+    function changeTab(el, cat) {
+        const buttons = document.querySelectorAll('.tab-btn');
+        buttons.forEach(b => {
+            if(b.innerText.trim() === cat.trim()) b.classList.add('active');
+            else b.classList.remove('active');
+        });
+
+        currentTab = cat;
+        currentVer = '전체';
+        currentFsType = '전체';
+
+        const vFilter = document.getElementById('version-filter');
+        const fFilter = document.getElementById('fansign-filter');
+        vFilter.style.display = 'none';
+        fFilter.style.display = 'none';
+
+        if (cat.includes('앨범')) {
+            if (currentAlbum === 'The Chase' || currentAlbum === 'FOCUS') {
+                vFilter.style.display = 'block';
+                let vers = ['전체'];
+                if (currentAlbum === 'The Chase') vers.push('Photobook Ver.', 'Package Ver.', 'Minibook Ver.');
+                else if (currentAlbum === 'FOCUS') vers.push('Rule Book Ver.', 'PhotoBook Ver.', 'Heart Locket Ver.', 'SMini Ver.');
+                document.getElementById('version-btn-wrapper').innerHTML = vers.map(v => `<button class="f-btn ${v==='전체'?'active':''}" onclick="setVersion(this, '${v}')">${v}</button>`).join('');
+            }
+        } else if (cat.includes('팬싸')) {
+            if (currentAlbum === 'The Chase' || currentAlbum === 'FOCUS' || currentAlbum === 'STYLE') {
+                fFilter.style.display = 'block';
+                document.getElementById('fansign-btn-wrapper').innerHTML = ['전체', '대면', '영통'].map(t => `<button class="f-btn ${t==='전체'?'active':''}" onclick="setFsType(this, '${t}')">${t}</button>`).join('');
+            }
+        }
+        renderCards();
+    }
+
+    function setVersion(el, ver) {
+        el.parentElement.querySelectorAll('.f-btn').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+        currentVer = ver;
+        renderCards();
+    }
+
+    function setFsType(el, type) {
+        el.parentElement.querySelectorAll('.f-btn').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+        currentFsType = type;
+        renderCards();
+    }
+
+ function renderCards(keyword = '') {
+        const sliderContainer = document.getElementById('grid-slider-container');
+        const gridRange = document.getElementById('grid-range');
+
+        // 1. 데이터 필터링
+        let filtered = pcData.filter(pc => {
+            if (keyword !== '') {
+                const target = keyword.toLowerCase();
+                return pc.name.toLowerCase().includes(target) || (pc.info && pc.info.toLowerCase().includes(target));
+            }
+            const mAlb = currentAlbum === '전체' || pc.album === currentAlbum;
+            const mTab = currentTab === '전체' || pc.category === currentTab;
+            const mVer = currentVer === '전체' || pc.version === currentVer;
+            const mFs = currentFsType === '전체' || pc.fsType === currentFsType;
+            return mAlb && mTab && mVer && mFs;
+        });
+
+        // 2. 정렬 (앨범 우선 -> 이름/숫자 순)
+        filtered.sort((a, b) => {
+            const albumOrder = ['The Chase', 'STYLE', 'FOCUS', 'RUDE!', '유닛 포카', 'MD 포카', '기타'];
+            const albumA = albumOrder.indexOf(a.album);
+            const albumB = albumOrder.indexOf(b.album);
+            if (albumA !== albumB) return albumA - albumB;
+            return a.name.localeCompare(b.name, 'ko', { numeric: true, sensitivity: 'base' });
+        });
+// 2. 정렬 (앨범 지정 순서 -> 이름 순)
+    filtered.sort((a, b) => {
+        // 이 배열 순서대로 앨범이 정렬됩니다.
+        const albumOrder = ['The Chase', 'STYLE', 'FOCUS', 'RUDE!', '유닛 포카', 'MD 포카', '기타'];
+        
+        const albumA = albumOrder.indexOf(a.album);
+        const albumB = albumOrder.indexOf(b.album);
+
+        // 1순위: 앨범 순서 비교
+        if (albumA !== albumB) {
+            // albumOrder에 없는 앨범은 뒤로 보냄 (-1 처리 방지)
+            if (albumA === -1) return 1;
+            if (albumB === -1) return -1;
+            return albumA - albumB;
+        }
+        
+        // 2순위: 같은 앨범 내에서 이름(숫자포함) 정렬
+        return a.name.localeCompare(b.name, 'ko', { numeric: true, sensitivity: 'base' });
+    });
+
+
+
+
+// 3. [핵심 수정] '전체'일 때만 슬라이더 노출, 나머지는 2열 리셋
+    // 전체 탭이거나 검색 중일 때 슬라이더 허용
+    if (currentAlbum === '전체' || currentTab === '전체' || keyword !== '') {
+        sliderContainer.style.display = 'flex';
+        document.documentElement.style.setProperty('--grid-cols', gridRange.value);
+        if (gridRange.value >= 3) pcList.classList.add('grid-3-plus');
+    } else {
+        // 특정 앨범이나 메뉴로 들어가면 무조건 2열로 초기화
+        sliderContainer.style.display = 'none';
+        gridRange.value = 2; // 슬라이더 손잡이 위치도 2로 복구
+        document.documentElement.style.setProperty('--grid-cols', 2);
+        pcList.classList.remove('grid-3-plus');
+    }
+  
+
+        // 4. 화면 렌더링
+        document.getElementById('tab-label').innerText = keyword ? `"${keyword}" 결과: ${filtered.length}건` : `전체 ${filtered.length}개의 포토카드`;
+        pcList.innerHTML = filtered.length > 0 ? 
+            filtered.map(pc => createCardHTML(pc)).join('') : 
+            `<div style="grid-column: span var(--grid-cols, 2); padding: 100px 0; color:#bdc3c7; text-align:center; font-size:0.9rem;">데이터가 없습니다.</div>`;
+    }
+   
+
+    function showBookmarks() {
+        document.getElementById('welcome-view').style.display = 'none';
+        document.getElementById('result-area').style.display = 'block';
+        document.getElementById('display-album-name').innerText = "내 북마크";
+        document.getElementById('tab-wrapper').innerHTML = ""; 
+        document.getElementById('version-filter').style.display = 'none';
+        document.getElementById('fansign-filter').style.display = 'none';
+        sliderContainer.style.display = 'none';
+        searchBar.style.display = 'none';
+        const bookmarkData = pcData.filter(pc => bookmarks.includes(pc.id)).sort((a,b) => a.name.localeCompare(b.name, 'ko', {numeric:true}));
+        document.getElementById('tab-label').innerText = `${bookmarkData.length}개의 북마크한 포토카드`;
+        pcList.innerHTML = bookmarkData.length > 0 ? bookmarkData.map(pc => createCardHTML(pc)).join('') : `<div style="grid-column: span var(--grid-cols); padding: 100px 0; color:#bdc3c7; text-align:center; font-size:0.9rem;">북마크가 없습니다.</div>`;
+    }
+
+    function createCardHTML(pc) {
+        const isBookmarked = bookmarks.includes(pc.id);
+        const imgTag = pc.imgUrl ? `<img src="${pc.imgUrl}" alt="${pc.name}" onclick="openModal('${pc.imgUrl}')">` : `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#dfe6e9;"><i class="fas fa-image fa-2x"></i></div>`;
+        return `
+            <div class="card-item">
+                <button class="card-bookmark-btn ${isBookmarked ? 'active' : ''}" onclick="toggleBookmark('${pc.id}')"><i class="${isBookmarked ? 'fas' : 'far'} fa-heart"></i></button>
+                <div class="card-image-wrapper">${imgTag}</div>
+                <div class="card-name">${pc.name}</div>
+            </div>
+        `;
+    }
+
+    function toggleBookmark(id) {
+        const index = bookmarks.indexOf(id);
+        if (index > -1) { bookmarks.splice(index, 1); } 
+        else { bookmarks.push(id); }
+        localStorage.setItem('jiwoo_bookmarks', JSON.stringify(bookmarks));
+        if (document.getElementById('display-album-name').innerText === "내 북마크") showBookmarks();
+        else renderCards(searchInput.value);
+    }
+
+    searchToggle.addEventListener('click', () => {
+        const isVisible = searchBar.style.display === 'block';
+        searchBar.style.display = isVisible ? 'none' : 'block';
+        if (!isVisible) {
+            searchInput.focus();
+            searchInput.value = '';
+            document.getElementById('welcome-view').style.display = 'none';
+            document.getElementById('result-area').style.display = 'none';
+        } else {
+            goHome();
+        }
+    });
+
+    searchInput.addEventListener('input', (e) => {
+        const val = e.target.value;
+        const tabWrapper = document.getElementById('tab-wrapper');
+        if (val.trim() !== '') {
+            document.getElementById('result-area').style.display = 'block';
+            document.getElementById('display-album-name').innerText = "검색 결과";
+            tabWrapper.style.display = 'none';
+            renderCards(val);
+        } else {
+            document.getElementById('result-area').style.display = 'none';
+            tabWrapper.style.display = 'flex';
+        }
+    });
+
+    function openModal(url) {
+        const modal = document.getElementById('image-modal');
+        const modalImg = document.getElementById('modal-img');
+        modal.style.display = "flex";
+        modalImg.src = url;
+        document.body.style.overflow = "hidden";
+    }
+
+    function closeModal() {
+        document.getElementById('image-modal').style.display = "none";
+        document.body.style.overflow = "auto";
+    }
+
+    menuToggle.addEventListener('click', () => {
+        if (tocMenu.style.display === 'block') {
+            tocMenu.style.display = 'none'; mainView.style.display = 'block';
+            menuToggle.querySelector('i').className = 'fas fa-bars';
+        } else {
+            tocMenu.style.display = 'block'; mainView.style.display = 'none';
+            menuToggle.querySelector('i').className = 'fas fa-times';
+        }
+    });
+
+    renderMenu();
+</script>
