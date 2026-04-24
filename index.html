@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <style>
         :root {
             --primary: #007bff;
@@ -116,12 +116,45 @@
         }
 
         /* [수정] 동적 가로 배열 시스템 */
-        .card-grid { 
-            display: grid; 
-            grid-template-columns: repeat(var(--grid-cols), 1fr); 
-            gap: calc(20px / var(--grid-cols)); 
-            margin-top: 10px; 
-        }
+   /* [수정] 그리드 시스템 안정화 */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--grid-cols), 1fr);
+    /* 첫 줄 크기가 이상해지는 걸 방지하기 위해 높이값을 자동으로 고정 */
+    grid-auto-rows: min-content; 
+    gap: 10px; /* 간격을 조금 좁혀서 공간 확보 */
+    margin-top: 10px;
+    width: 100%;
+}
+
+/* [수정] 5열(축소)일 때 이미지와 이름표 크기 강제 조정 */
+.grid-5-plus .card-name {
+    font-size: 0.6rem !important; /* 글씨를 더 작게 */
+    margin: 4px 0 0;
+    line-height: 1;
+    word-break: break-all;
+}
+
+.grid-5-plus .card-item {
+    padding: 3px !important;
+}
+
+/* [수정] 상위 메뉴(TOC) 스크롤 문제 해결 */
+.toc-menu {
+    position: fixed;
+    top: 57px;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 500px;
+    width: 100%;
+    /* 4개까지만 보이던 현상 해결: 높이를 꽉 채우고 스크롤 허용 */
+    height: calc(100vh - 57px); 
+    max-height: calc(100vh - 57px);
+    overflow-y: auto !important; 
+    -webkit-overflow-scrolling: touch; /* 아이폰 부드러운 스크롤 */
+    background-color: #fff;
+    z-index: 2000;
+}
 
         .card-item { 
             background: #fff; border-radius: 12px; border: 1px solid var(--border); 
@@ -764,6 +797,26 @@ gridRange.max = 5; //
  function renderCards(keyword = '') {
         const sliderContainer = document.getElementById('grid-slider-container');
         const gridRange = document.getElementById('grid-range');
+// 슬라이더 작동 로직 (이 부분을 찾아서 교체하세요!)
+gridRange.addEventListener('input', (e) => {
+    const val = e.target.value;
+    
+    // 1. 화면에 보여줄 열 개수(변수) 설정
+    document.documentElement.style.setProperty('--grid-cols', val);
+    
+    // 2. 기존 클래스 싹 지우고 새로 추가 (5열일 때 디자인 깨짐 방지)
+    pcList.classList.remove('grid-3-plus', 'grid-5-plus');
+    
+    if (val >= 5) {
+        pcList.classList.add('grid-5-plus'); // 5열 전용 스타일 적용
+    } else if (val >= 3) {
+        pcList.classList.add('grid-3-plus'); // 3~4열 스타일 적용
+    }
+});
+
+
+
+
 
         // 1. 데이터 필터링
         let filtered = pcData.filter(pc => {
