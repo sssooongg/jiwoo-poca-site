@@ -138,6 +138,15 @@
 .grid-5-plus .card-item {
     padding: 3px !important;
 }
+/* 5열(축소)일 때 북마크 버튼 스타일 강제 조정 */
+.grid-5-plus .card-bookmark-btn {
+    width: 18px !important;    /* 크기 대폭 축소 */
+    height: 18px !important;
+    font-size: 0.6rem !important; /* 아이콘 크기 축소 */
+    top: 4px !important;       /* 오른쪽 위 구석으로 밀기 */
+    right: 4px !important;
+    background: rgba(255, 255, 255, 0.6); /* 더 투명하게 해서 사진 덜 가리게 */
+}
 
 /* [수정] 상위 메뉴(TOC) 스크롤 문제 해결 */
 .toc-menu {
