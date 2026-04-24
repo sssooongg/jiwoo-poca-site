@@ -129,10 +129,16 @@
             box-shadow: var(--card-shadow);
         }
         
-        .card-image-wrapper { 
-            width: 100%; aspect-ratio: 5.5 / 8.5; border-radius: 8px; overflow: hidden; 
-            background: #f1f2f6; position: relative;
-        }
+        .card-image-wrapper {
+    width: 100% !important;
+    aspect-ratio: 55 / 85 !important;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    overflow: hidden !important;
+    position: relative;
+    flex-shrink: 0 !important;
+}
+
         .card-image-wrapper img { width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
         
         .card-name { font-size: 0.85rem; font-weight: 700; color: #2d3436; margin: 10px 0 4px; text-align: center; }
