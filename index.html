@@ -778,45 +778,58 @@ gridRange.max = 5; //
             return mAlb && mTab && mVer && mFs;
         });
 
-// 정렬 로직 (전체 메뉴 시 앨범포카 최우선 순위 부여)
-        filtered.sort((a, b) => {
-            const albumKeywords = ['THE CHASE', 'STYLE', 'FOCUS', 'RUDE!'];
-            
-            // 1. [핵심] 전체 탭일 때 '앨범 포카' 카테고리에 압도적 우선순위 부여
-            if (currentAlbum === '전체' || currentAlbum === '') {
-                const isAlbumPCA = a.category === '앨범 포카' ? 0 : 1;
-                const isAlbumPCB = b.category === '앨범 포카' ? 0 : 1;
-                if (isAlbumPCA !== isAlbumPCB) return isAlbumPCA - isAlbumPCB;
-            }
+filtered.sort((a, b) => {
+    // 1. [대원칙] 앨범 키워드 순서 정의
+    const albumKeywords = ['THE CHASE', 'STYLE', 'FOCUS', 'RUDE!'];
+    
+    // 카테고리별 우선순위 (번호가 작을수록 위로)
+    const categoryOrder = {
+        '앨범 포카': 1,
+        '예판 특전': 2,
+        '럭키드로우': 3,
+        '팬싸 특전': 4
+    };
 
-            // 2. 앨범 키워드 순서 (The Chase -> STYLE -> ...)
-            const getPri = (pc) => {
-                const text = (pc.album + pc.name).toUpperCase();
-                for (let i = 0; i < albumKeywords.length; i++) {
-                    if (text.includes(albumKeywords[i])) return i;
-                }
-                return 99;
-            };
-            const priA = getPri(a); const priB = getPri(b);
-            if (priA !== priB) return priA - priB;
+    // 포카가 어떤 앨범 그룹에 속하는지 인덱스 반환 함수
+    const getAlbumIdx = (pc) => {
+        const text = (pc.album + pc.name).toUpperCase();
+        for (let i = 0; i < albumKeywords.length; i++) {
+            if (text.includes(albumKeywords[i])) return i;
+        }
+        return 99; // 키워드 없으면 뒤로
+    };
 
-            // 3. 같은 앨범 내 카테고리 순서 (앨범 -> 예판 -> 럭드 -> 팬싸)
-            const categoryOrder = ['앨범 포카', '예판 특전', '럭키드로우', '팬싸 특전'];
-            let catA = categoryOrder.indexOf(a.category);
-            let catB = categoryOrder.indexOf(b.category);
-            
-            if (catA === -1 && !['예판 특전', '럭키드로우', '팬싸 특전'].includes(a.category)) catA = 0;
-            if (catB === -1 && !['예판 특전', '럭키드로우', '팬싸 특전'].includes(b.category)) catB = 0;
-            if (catA !== catB) return catA - catB;
+    const albA = getAlbumIdx(a);
+    const albB = getAlbumIdx(b);
 
-            // 4. 이름순 정렬
-            return a.name.toLowerCase().localeCompare(b.name.toLowerCase(), 'ko', { numeric: true });
-        });
+    // [Step 1] 앨범 키워드 순서가 다르면 앨범별로 정렬
+    if (albA !== albB) return albA - albB;
 
+    // --- 여기서부터는 같은 앨범 키워드(예: 둘 다 The Chase 관련) 내 정렬 ---
 
+    // [Step 2] 카테고리 우선순위 적용 (앨범->예판->럭드->팬싸)
+    const catPriA = categoryOrder[a.category] || 5; // 위 4개 카테고리 아니면(유닛/MD 등) 5번
+    const catPriB = categoryOrder[b.category] || 5;
 
+    if (catPriA !== catPriB) return catPriA - catPriB;
 
+    // [Step 3] 같은 카테고리 안이거나, 둘 다 유닛/MD인 경우 이름순 정렬 (한글->숫자->영어)
+    const getCharPriority = (str) => {
+        const first = str.trim().charAt(0);
+        if (/[가-힣]/.test(first)) return 1;
+        if (/[0-9]/.test(first)) return 2;
+        if (/[a-zA-Z]/.test(first)) return 3;
+        return 4;
+    };
 
+    const pA = getCharPriority(a.name);
+    const pB = getCharPriority(b.name);
+
+    if (pA !== pB) return pA - pB;
+    
+    // 최종 가나다순
+    return a.name.toLowerCase().localeCompare(b.name.toLowerCase(), 'ko', { numeric: true });
+});
 
 
 
