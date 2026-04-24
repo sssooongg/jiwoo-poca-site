@@ -42,20 +42,42 @@
 
         .container { max-width: 500px; margin: 0 auto; min-height: 100vh; background-color: #fff; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.05); }
         
-        .header { 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 12px 20px; background-color: #fff; border-bottom: 1px solid var(--border);
-            position: sticky; top: 0; z-index: 1000;
-        }
+     .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    height: 57px;
+    position: fixed;  /* sticky → fixed 로 변경 */
+    top: 0;
+    z-index: 1000;
+    background-color: #fff;
+    width: 100%;
+    max-width: 500px;  /* 이것도 추가 */
+padding: 0 20px;
+}
+
+
         .logo { font-size: 20px; font-weight: 700; color: #1e272e; cursor: pointer; user-select: none; letter-spacing: -0.5px; }
         .icon-btn { background: none; border: none; cursor: pointer; color: #485460; font-size: 1.2rem; padding: 8px; transition: color 0.2s; }
         
-        .toc-menu { 
-            display: none; background-color: #fff; padding: 15px 20px; 
-            position: absolute; top: 57px; left: 0; width: 100%; 
-            height: calc(100vh - 57px); z-index: 2000; overflow-y: auto;
-        }
-        .menu-group { border-bottom: 1px solid var(--border); padding: 5px 0; }
+       .toc-menu { 
+    position: fixed; /* absolute 대신 fixed로 변경하여 화면에 고정 */
+    top: 57px;
+    left: 50%; /* 가운데 정렬 유지 */
+    transform: translateX(-50%);
+    max-width: 500px; /* 컨테이너 너비와 동일하게 */
+    width: 100%;
+    height: calc(100vh - 57px);
+    z-index: 2000;
+    overflow-y: auto;
+    background-color: #fff;
+}
+
+        .menu-group { 
+    border-bottom: 1px solid var(--border); 
+    padding: 0 20px; 
+}
         .menu-parent-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; }
         .menu-parent-text { font-size: 1.05rem; font-weight: 700; color: #2d3436; cursor: pointer; flex: 1; }
         .toggle-btn { padding: 10px; cursor: pointer; color: #b2bec3; transition: 0.3s; }
@@ -63,7 +85,11 @@
         .menu-child-list { list-style: none; padding: 5px 0 15px 5px; display: none; flex-wrap: wrap; gap: 8px; }
         .menu-child-item { font-size: 0.8rem; color: #636e72; cursor: pointer; background: #f1f2f6; padding: 6px 14px; border-radius: 20px; transition: 0.2s; }
 
-        .main-content { padding: 20px; min-height: 80vh; }
+        .main-content { 
+    padding: 20px; 
+    min-height: 80vh; 
+    padding-top: 77px;  /* 57px 헤더 높이 + 20px 여백 */
+}
         
         .welcome { text-align: center; margin-top: 80px; animation: fadeIn 0.8s; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -166,18 +192,7 @@
     height: 155px;       /* 100~150 사이로 원하는 크기를 조절해 보세요 */
     width: auto;
 }
-/* 헤더 전체 구조 설정 */
-.header {
-    display: flex;
-    justify-content: space-between; /* 양끝으로 버튼 배치 */
-    align-items: center;
-    padding: 12px 20px;
-    height: 57px; /* 높이를 고정해서 들썩임 방지 */
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    background-color: #fff;
-}
+
 
 /* 로고를 부모(헤더) 기준 정중앙에 절대 좌표로 박아버림 */
 .logo {
@@ -200,9 +215,9 @@
     justify-content: center;
     align-items: center;
 }
-/* 1. 스크롤바 공간을 강제로 고정해서 화면 밀림 방지 */
+
 html {
-    overflow-y: scroll; 
+    overflow-y: auto; 
 }
 
 /* 2. 메뉴 열릴 때 바디 고정 */
@@ -664,16 +679,15 @@ gridRange.max = 5; //
         else pcList.classList.remove('grid-3-plus');
     });
 
-    function goHome() {
-        tocMenu.style.display = 'none';
-        mainView.style.display = 'block';
-        searchBar.style.display = 'none';
-        sliderContainer.style.display = 'none';
-        document.getElementById('tab-wrapper').style.display = 'flex';
-        menuToggle.querySelector('i').className = 'fas fa-bars';
-        document.getElementById('welcome-view').style.display = 'block';
-        document.getElementById('result-area').style.display = 'none';
-    }
+   function goHome() {
+    tocMenu.style.display = 'none';
+    searchBar.style.display = 'none';
+    sliderContainer.style.display = 'none';
+    document.getElementById('tab-wrapper').style.display = 'flex';
+    menuToggle.querySelector('i').className = 'fas fa-bars';
+    document.getElementById('welcome-view').style.display = 'block';
+    document.getElementById('result-area').style.display = 'none';
+}
 
     function renderMenu() {
         menuListContainer.innerHTML = menuStructure.map((parent, index) => `
@@ -706,7 +720,8 @@ gridRange.max = 5; //
         document.getElementById('result-area').style.display = 'block';
         document.getElementById('display-album-name').innerText = name;
         currentAlbum = name;
-        
+        document.body.style.overflow = 'auto';
+
         let tabs = ['전체'];
         const findMenu = menuStructure.find(m => m.name === name);
         if (findMenu) tabs = tabs.concat(findMenu.children);
@@ -833,20 +848,22 @@ filtered.sort((a, b) => {
 
 
 
-// 3. [핵심 수정] '전체'일 때만 슬라이더 노출, 나머지는 2열 리셋
-    // 전체 탭이거나 검색 중일 때 슬라이더 허용
-    if (currentAlbum === '전체' || currentTab === '전체' || keyword !== '') {
-        sliderContainer.style.display = 'flex';
-        document.documentElement.style.setProperty('--grid-cols', gridRange.value);
-        if (gridRange.value >= 3) pcList.classList.add('grid-3-plus');
-    } else {
-        // 특정 앨범이나 메뉴로 들어가면 무조건 2열로 초기화
-        sliderContainer.style.display = 'none';
-        gridRange.value = 2; // 슬라이더 손잡이 위치도 2로 복구
-        document.documentElement.style.setProperty('--grid-cols', 2);
-        pcList.classList.remove('grid-3-plus');
-    }
-  
+// MD 포카도 슬라이더 허용 목록에 추가
+const showSliderAlbums = ['전체', 'MD 포카'];
+const showSlider = showSliderAlbums.includes(currentAlbum) || currentTab === '전체' || keyword !== '';
+
+if (showSlider) {
+    sliderContainer.style.display = 'flex';
+    const cols = parseInt(gridRange.value);
+    document.documentElement.style.setProperty('--grid-cols', cols);
+    if (cols >= 3) pcList.classList.add('grid-3-plus');
+    else pcList.classList.remove('grid-3-plus');
+} else {
+    sliderContainer.style.display = 'none';
+    gridRange.value = 2;
+    document.documentElement.style.setProperty('--grid-cols', '2');
+    pcList.classList.remove('grid-3-plus');
+}
 
         // 4. 화면 렌더링
         document.getElementById('tab-label').innerText = keyword ? `"${keyword}" 결과: ${filtered.length}건` : `전체 ${filtered.length}개의 포토카드`;
@@ -937,15 +954,18 @@ filtered.sort((a, b) => {
         document.body.style.overflow = "auto";
     }
 
-    menuToggle.addEventListener('click', () => {
-        if (tocMenu.style.display === 'block') {
-            tocMenu.style.display = 'none'; mainView.style.display = 'block';
-            menuToggle.querySelector('i').className = 'fas fa-bars';
-        } else {
-            tocMenu.style.display = 'block'; mainView.style.display = 'none';
-            menuToggle.querySelector('i').className = 'fas fa-times';
-        }
-    });
+menuToggle.addEventListener('click', () => {
+    if (tocMenu.style.display === 'block') {
+        tocMenu.style.display = 'none';
+        menuToggle.querySelector('i').className = 'fas fa-bars';
+        document.body.style.overflow = 'auto';
+    } else {
+        tocMenu.style.display = 'block';
+        menuToggle.querySelector('i').className = 'fas fa-times';
+        document.body.style.overflow = 'hidden';
+    }
+});
+
 searchToggle.addEventListener('click', () => {
     const isVisible = searchBar.style.display === 'block';
     if (isVisible) {
@@ -955,7 +975,7 @@ searchToggle.addEventListener('click', () => {
         document.getElementById('tab-wrapper').style.display = 'flex';
     } else {
         tocMenu.style.display = 'none';
-        mainView.style.display = 'block';
+    
         menuToggle.querySelector('i').className = 'fas fa-bars';
         searchBar.style.display = 'block';
         searchInput.focus();
