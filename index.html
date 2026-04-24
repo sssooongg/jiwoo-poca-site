@@ -115,33 +115,63 @@
             background: var(--primary); border-radius: 50%; cursor: pointer;
         }
 
-        /* [수정] 동적 가로 배열 시스템 */
-        .card-grid { 
-            display: grid; 
-            grid-template-columns: repeat(var(--grid-cols), 1fr); 
-            gap: calc(20px / var(--grid-cols)); 
-            margin-top: 10px; 
-        }
+       /* [그리드 레이아웃] 어떤 메뉴에서도 줄 깨짐 방지 */
+.card-grid {
+    display: grid !important;
+    grid-template-columns: repeat(var(--grid-cols, 2), 1fr) !important;
+    grid-auto-rows: min-content !important; /* 내용물 높이에 맞게 줄 자동 조절 */
+    gap: 8px !important;
+    width: 100% !important;
+    align-items: start !important;
+}
 
-        .card-item { 
-            background: #fff; border-radius: 12px; border: 1px solid var(--border); 
-            padding: 8px; display: flex; flex-direction: column; position: relative; 
-            box-shadow: var(--card-shadow);
-        }
-        
-        .card-image-wrapper { 
-            width: 100%; aspect-ratio: 5.5 / 8.5; border-radius: 8px; overflow: hidden; 
-            background: #f1f2f6; position: relative;
-        }
-        .card-image-wrapper img { width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
-        
-        .card-name { font-size: 0.85rem; font-weight: 700; color: #2d3436; margin: 10px 0 4px; text-align: center; }
-        
-        /* 3열 이상(축소 시) 스타일 자동 조정 */
-        .grid-3-plus .card-name { font-size: 0.7rem; margin: 6px 0 2px; line-height: 1.2; }
-        .grid-3-plus .card-item { padding: 5px; border-radius: 8px; }
-        .grid-3-plus .card-bookmark-btn { width: 24px; height: 24px; font-size: 0.8rem; top: 8px; right: 8px; }
+/* [카드 아이템] 모든 카드의 높이를 내용물에 맞게 통일 */
+.card-item {
+    display: flex !important;
+    flex-direction: column !important;
+    height: auto !important;
+}
 
+/* [이미지 래퍼] FOCUS 탭 비율 깨짐 해결책 */
+.card-image-wrapper {
+    width: 100% !important;
+    aspect-ratio: 5.5 / 8.5 !important; /* 포카 표준 비율로 강제 고정 */
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    overflow: hidden !important;
+    position: relative;
+}
+
+.card-image-wrapper img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important; /* 이미지가 찌그러지지 않고 꽉 차게 */
+}
+
+/* [5열 모드] 전체/MD 탭에서도 강제로 적용되게 하는 스타일 */
+.grid-5-plus {
+    gap: 4px !important;
+}
+
+.grid-5-plus .card-item {
+    padding: 2px !important;
+}
+
+.grid-5-plus .card-name {
+    font-size: 0.55rem !important;
+    line-height: 1.1 !important;
+    margin-top: 3px !important;
+    letter-spacing: -0.5px;
+}
+
+/* 5열일 때 북마크 버튼 위치 조정 */
+.grid-5-plus .card-bookmark-btn {
+    width: 18px !important;
+    height: 18px !important;
+    font-size: 0.6rem !important;
+    top: 3px !important;
+    right: 3px !important;
+}
         .card-bookmark-btn { 
             position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.8); 
             border: none; cursor: pointer; font-size: 1.1rem; color: #dfe6e9; 
@@ -749,75 +779,64 @@ gridRange.max = 5; //
     }
 
  function renderCards(keyword = '') {
-        const sliderContainer = document.getElementById('grid-slider-container');
-        const gridRange = document.getElementById('grid-range');
-
-        // 1. 데이터 필터링
-        let filtered = pcData.filter(pc => {
-            if (keyword !== '') {
-                const target = keyword.toLowerCase();
-                return pc.name.toLowerCase().includes(target) || (pc.info && pc.info.toLowerCase().includes(target));
-            }
-            const mAlb = currentAlbum === '전체' || pc.album === currentAlbum;
-            const mTab = currentTab === '전체' || pc.category === currentTab;
-            const mVer = currentVer === '전체' || pc.version === currentVer;
-            const mFs = currentFsType === '전체' || pc.fsType === currentFsType;
-            return mAlb && mTab && mVer && mFs;
-        });
-
-        // 2. 정렬 (앨범 우선 -> 이름/숫자 순)
-        filtered.sort((a, b) => {
-            const albumOrder = ['The Chase', 'STYLE', 'FOCUS', 'RUDE!', '유닛 포카', 'MD 포카', '기타'];
-            const albumA = albumOrder.indexOf(a.album);
-            const albumB = albumOrder.indexOf(b.album);
-            if (albumA !== albumB) return albumA - albumB;
-            return a.name.localeCompare(b.name, 'ko', { numeric: true, sensitivity: 'base' });
-        });
-// 2. 정렬 (앨범 지정 순서 -> 이름 순)
-    filtered.sort((a, b) => {
-        // 이 배열 순서대로 앨범이 정렬됩니다.
-        const albumOrder = ['The Chase', 'STYLE', 'FOCUS', 'RUDE!', '유닛 포카', 'MD 포카', '기타'];
-        
-        const albumA = albumOrder.indexOf(a.album);
-        const albumB = albumOrder.indexOf(b.album);
-
-        // 1순위: 앨범 순서 비교
-        if (albumA !== albumB) {
-            // albumOrder에 없는 앨범은 뒤로 보냄 (-1 처리 방지)
-            if (albumA === -1) return 1;
-            if (albumB === -1) return -1;
-            return albumA - albumB;
+    // 1. 데이터 필터링 (기존 로직 유지)
+    let filtered = pcData.filter(pc => {
+        if (keyword !== '') {
+            const target = keyword.toLowerCase();
+            return pc.name.toLowerCase().includes(target) || (pc.info && pc.info.toLowerCase().includes(target));
         }
-        
-        // 2순위: 같은 앨범 내에서 이름(숫자포함) 정렬
-        return a.name.localeCompare(b.name, 'ko', { numeric: true, sensitivity: 'base' });
+        const mAlb = currentAlbum === '전체' || pc.album === currentAlbum;
+        const mTab = currentTab === '전체' || pc.category === currentTab;
+        return mAlb && mTab;
     });
 
+    // 2. 정렬 로직 (아까 완성한 폴라 정렬 포함 버전)
+    filtered.sort((a, b) => {
+        const albumKeywords = ['THE CHASE', 'STYLE', 'FOCUS', 'RUDE!'];
+        const getAlbumPriority = (pc) => {
+            const fullText = (pc.album + pc.name).toUpperCase();
+            for (let i = 0; i < albumKeywords.length; i++) {
+                if (fullText.includes(albumKeywords[i])) return i;
+            }
+            if (pc.album === '유닛 포카') return 4;
+            if (pc.album === 'MD 포카') return 5;
+            return 6;
+        };
+        const priA = getAlbumPriority(a); const priB = getAlbumPriority(b);
+        if (priA !== priB) return priA - priB;
 
+        const categoryOrder = { '앨범 포카': 1, '예판 특전': 2, '럭키드로우': 3, '팬싸 특전': 4 };
+        const catA = categoryOrder[a.category] || 5; const catB = categoryOrder[b.category] || 5;
+        if (catA !== catB) return catA - catB;
 
+        const cleanA = a.name.replace(/폴라/g, '').trim();
+        const cleanB = b.name.replace(/폴라/g, '').trim();
+        if (cleanA !== cleanB) {
+            return cleanA.localeCompare(cleanB, 'ko', { numeric: true });
+        }
+        return a.name.includes('폴라') ? 1 : -1;
+    });
 
-// 3. [핵심 수정] '전체'일 때만 슬라이더 노출, 나머지는 2열 리셋
-    // 전체 탭이거나 검색 중일 때 슬라이더 허용
-    if (currentAlbum === '전체' || currentTab === '전체' || keyword !== '') {
-        sliderContainer.style.display = 'flex';
-        document.documentElement.style.setProperty('--grid-cols', gridRange.value);
-        if (gridRange.value >= 3) pcList.classList.add('grid-3-plus');
+    // 3. [중요] 5열 클래스 강제 제어 로직
+    const val = gridRange.value;
+    pcList.classList.remove('grid-3-plus', 'grid-5-plus');
+    
+    if (val >= 5) {
+        pcList.classList.add('grid-5-plus');
+        document.documentElement.style.setProperty('--grid-cols', 5);
+    } else if (val >= 3) {
+        pcList.classList.add('grid-3-plus');
+        document.documentElement.style.setProperty('--grid-cols', val);
     } else {
-        // 특정 앨범이나 메뉴로 들어가면 무조건 2열로 초기화
-        sliderContainer.style.display = 'none';
-        gridRange.value = 2; // 슬라이더 손잡이 위치도 2로 복구
         document.documentElement.style.setProperty('--grid-cols', 2);
-        pcList.classList.remove('grid-3-plus');
     }
-  
 
-        // 4. 화면 렌더링
-        document.getElementById('tab-label').innerText = keyword ? `"${keyword}" 결과: ${filtered.length}건` : `전체 ${filtered.length}개의 포토카드`;
-        pcList.innerHTML = filtered.length > 0 ? 
-            filtered.map(pc => createCardHTML(pc)).join('') : 
-            `<div style="grid-column: span var(--grid-cols, 2); padding: 100px 0; color:#bdc3c7; text-align:center; font-size:0.9rem;">데이터가 없습니다.</div>`;
-    }
-   
+    // 4. 화면 출력
+    document.getElementById('tab-label').innerText = keyword ? `"${keyword}" 결과: ${filtered.length}건` : `전체 ${filtered.length}개의 포토카드`;
+    pcList.innerHTML = filtered.length > 0 ? 
+        filtered.map(pc => createCardHTML(pc)).join('') : 
+        `<div style="grid-column: span var(--grid-cols, 2); padding: 100px 0; color:#bdc3c7; text-align:center;">데이터가 없습니다.</div>`;
+}   
 
     function showBookmarks() {
         document.getElementById('welcome-view').style.display = 'none';
