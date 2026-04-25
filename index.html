@@ -26,13 +26,10 @@
             font-family: 'Noto Sans KR', sans-serif; background-color: var(--bg); color: #2d3436; line-height: 1.6;
             touch-action: pan-x pan-y; -webkit-text-size-adjust: none; overflow-x: hidden;
         }
-
-        /* 메뉴 열림 상태에서 뒤쪽 배경 고정 */
         body.menu-open { overflow: hidden; position: fixed; width: 100%; height: 100%; }
 
         .container { max-width: 500px; margin: 0 auto; min-height: 100vh; background-color: #fff; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.05); }
         
-        /* [수정] 헤더 완전 고정 및 z-index 최상위 유지 */
         .header {
             display: flex; justify-content: space-between; align-items: center;
             padding: 12px 20px; height: 57px; 
@@ -44,7 +41,6 @@
         .logo { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 20px; font-weight: 700; color: #1e272e; cursor: pointer; white-space: nowrap; }
         .icon-btn { background: none; border: none; cursor: pointer; color: #485460; font-size: 1.2rem; padding: 8px; position: relative; z-index: 3100; }
 
-        /* 헤더가 고정되었으므로 컨텐츠 영역 상단에 여백 추가 */
         .main-content { padding: 77px 20px 20px; min-height: 80vh; }
 
         .toc-menu {
@@ -91,16 +87,31 @@
         .zoom-slider { -webkit-appearance: none; width: 80px; height: 4px; background: #dfe6e9; border-radius: 2px; outline: none; }
         .zoom-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; background: var(--primary); border-radius: 50%; cursor: pointer; }
 
-        .card-grid { display: grid; grid-template-columns: repeat(var(--grid-cols), 1fr); gap: 10px; margin-top: 10px; align-items: start; }
+        .card-grid { display: grid; grid-template-columns: repeat(var(--grid-cols), 1fr); gap: 10px; margin-top: 10px; align-items: stretch; }
         .card-item { background: #fff; border-radius: 12px; border: 1px solid var(--border); padding: 8px; display: flex; flex-direction: column; position: relative; box-shadow: var(--card-shadow); transition: transform 0.2s; }
         .card-image-wrapper { width: 100%; aspect-ratio: 5.5 / 8.5; border-radius: 8px; overflow: hidden; background: #f1f2f6; }
         .card-image-wrapper img { width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
         
+        /* [수정] 카드 하단 이름 영역 높이 고정 및 텍스트 자동 조절 */
         .card-name { 
-            font-size: 0.8rem; font-weight: 700; color: #2d3436; margin: 8px 0 2px; text-align: center; 
-            min-height: 2.8em; line-height: 1.4; word-break: keep-all; display: flex; align-items: center; justify-content: center;
+            font-size: 0.75rem; font-weight: 700; color: #2d3436; 
+            margin: 8px 0 2px; text-align: center; 
+            height: 3.2em; /* 높이 고정 */
+            line-height: 1.1; 
+            word-break: keep-all; 
+            display: -webkit-box;
+            -webkit-line-clamp: 3; /* 최대 3줄 */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
         }
-        .grid-3-plus .card-name { font-size: 0.6rem; min-height: 3em; }
+
+        /* 3배열 이상일 때 글자 크기를 더 줄여서 비율 고정 */
+        .grid-3-plus .card-name { 
+            font-size: 0.6rem; 
+            height: 3.2em;
+            letter-spacing: -0.02em;
+        }
 
         .card-bookmark-btn { 
             position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.8); 
@@ -503,7 +514,6 @@
 
 
 
-
 ]; // [데이터 영역]
 
     let bookmarks = JSON.parse(localStorage.getItem('jiwoo_bookmarks')) || [];
@@ -539,6 +549,7 @@
             return mAlb && mTab && mVer && mFs;
         });
 
+        // 정렬 로직
         filtered.sort((a, b) => {
             const getAlbumPriority = (pc) => {
                 const name = pc.name.toUpperCase();
