@@ -82,24 +82,31 @@
         .zoom-slider { -webkit-appearance: none; width: 80px; height: 4px; background: #dfe6e9; border-radius: 2px; outline: none; }
         .zoom-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; background: var(--primary); border-radius: 50%; cursor: pointer; }
 
-        /* [수정] 4배열 시 비율 고정 설정 */
+        /* [비율 통일 핵심] 카드 그리드 및 아이템 설정 */
         .card-grid { 
             display: grid; 
             grid-template-columns: repeat(var(--grid-cols), 1fr); 
-            gap: 12px; 
+            gap: 10px; 
             margin-top: 10px; 
-            align-items: start; /* 위쪽 정렬로 세로 늘어남 방지 */
+            align-items: stretch; /* 모든 카드 높이 강제 통일 */
         }
         .card-item { 
             background: #fff; border-radius: 12px; border: 1px solid var(--border); 
             padding: 8px; display: flex; flex-direction: column; position: relative; 
-            box-shadow: var(--card-shadow);
+            box-shadow: var(--card-shadow); height: 100%;
         }
         .card-image-wrapper { width: 100%; aspect-ratio: 5.5 / 8.5; border-radius: 8px; overflow: hidden; background: #f1f2f6; }
         .card-image-wrapper img { width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
-        .card-name { font-size: 0.85rem; font-weight: 700; color: #2d3436; margin: 10px 0 4px; text-align: center; word-break: keep-all; }
+        
+        /* 텍스트 줄바꿈/높이 고정으로 가로줄 맞춤 */
+        .card-name { 
+            font-size: 0.8rem; font-weight: 700; color: #2d3436; 
+            margin: 8px 0 2px; text-align: center; 
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; 
+            overflow: hidden; min-height: 2.4em; line-height: 1.2; word-break: keep-all;
+        }
 
-        .grid-3-plus .card-name { font-size: 0.65rem; margin: 6px 0 2px; line-height: 1.2; }
+        .grid-3-plus .card-name { font-size: 0.65rem; min-height: 2.6em; margin-top: 5px; }
         .grid-3-plus .card-item { padding: 5px; border-radius: 8px; }
 
         .card-bookmark-btn { 
@@ -212,9 +219,9 @@
 </div>
 
 <script>
-    // pcData 자리에 기존에 가지고 계신 전체 데이터를 유지하세요.
+    // [중요] pcData 자리에 본인의 313개 전체 데이터를 붙여넣으세요.
     const pcData = [
- { id: '1', name: 'The Chase 지우 Photobook Ver.', album: 'The Chase', category: '앨범 포카', version: 'Photobook Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/photobook%20vers..jpg', info: '더체이스, 핑크색 배경, 네일, 깐머리, 노란색 옷' },
+      이스, 핑크색 배경, 네일, 깐머리, 노란색 옷' },
        { id: '2', name: 'The Chase 지우 Minibook Ver.', album: 'The Chase', category: '앨범 포카', version: 'Minibook Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/minibookver.jpg', info: '더체이스, 브이, 깐머리' },
  { id: '3', name: 'The Chase 지우 Package Ver.', album: 'The Chase', category: '앨범 포카', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/package%20ver..jpg', info: '더체이스, 앞머리, 초록색 옷' },
  { id: '4', name: 'The Chase 지우 메이크스타', album: 'The Chase', category: '예판 특전', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%A9%94%EC%9D%B4%ED%81%AC%20%EC%8A%A4%ED%83%80%20%EC%98%88%ED%8C%90%ED%8A%B9%EC%A0%84.jpg', info: '더체이스, 깐머리, 꽃받침, 윙크, 메이크스타' },
@@ -531,6 +538,10 @@
     ];
 
     let bookmarks = JSON.parse(localStorage.getItem('jiwoo_bookmarks')) || [];
+    let currentAlbum = '', currentTab = '', currentVer = '전체', currentFsType = '전체', currentViewingId = null, lastTapTime = 
+    ];
+
+    let bookmarks = JSON.parse(localStorage.getItem('jiwoo_bookmarks')) || [];
     let currentAlbum = '', currentTab = '', currentVer = '전체', currentFsType = '전체', currentViewingId = null, lastTapTime = 0;
 
     const pcList = document.getElementById('pc-list');
@@ -556,10 +567,16 @@
         else pcList.classList.remove('grid-3-plus');
     });
 
-    function goHome() { location.reload(); }
+    function goHome() {
+        currentAlbum = ''; currentTab = '';
+        document.getElementById('welcome-view').style.display = 'block';
+        document.getElementById('result-area').style.display = 'none';
+        document.getElementById('search-bar').style.display = 'none';
+        searchInput.value = '';
+    }
 
     function renderCards(keyword = '') {
-        // [수정] 검색 기능 실시간 작동을 위한 필터링 로직 우선순위 조정
+        // [튕김 방지] 검색어 필터링을 최우선으로 실행
         let filtered = pcData.filter(pc => {
             if (keyword !== '') {
                 const target = keyword.toLowerCase();
@@ -567,12 +584,10 @@
             }
             const mAlb = currentAlbum === '전체' || pc.album === currentAlbum;
             const mTab = currentTab === '전체' || pc.category === currentTab;
-            const mVer = currentVer === '전체' || pc.version === currentVer;
-            const mFs = currentFsType === '전체' || pc.fsType === currentFsType;
-            return mAlb && mTab && mVer && mFs;
+            return mAlb && mTab;
         });
 
-        // [정렬 로직 유지]
+        // 정렬 로직 복구
         filtered.sort((a, b) => {
             const albumKeywords = ['THE CHASE', 'STYLE', 'FOCUS', 'RUDE!'];
             const getAlbumPriority = (pc) => {
@@ -582,23 +597,19 @@
                 if (pc.album === 'MD 포카') return 5;
                 return 6;
             };
-            const priA = getAlbumPriority(a);
-            const priB = getAlbumPriority(b);
+            const priA = getAlbumPriority(a); const priB = getAlbumPriority(b);
             if (priA !== priB) return priA - priB;
             const categoryOrder = { '앨범 포카': 1, '예판 특전': 2, '럭키드로우': 3, '팬싸 특전': 4 };
-            const catA = categoryOrder[a.category] || 5;
-            const catB = categoryOrder[b.category] || 5;
+            const catA = categoryOrder[a.category] || 5; const catB = categoryOrder[b.category] || 5;
             if (catA !== catB) return catA - catB;
-            const cleanA = a.name.replace(/폴라/g, '').replace(/\s+/g, ' ').trim();
-            const cleanB = b.name.replace(/폴라/g, '').replace(/\s+/g, ' ').trim();
+            const cleanA = a.name.replace(/폴라/g, '').trim();
+            const cleanB = b.name.replace(/폴라/g, '').trim();
             if (cleanA !== cleanB) return cleanA.localeCompare(cleanB, 'ko', { numeric: true });
-            const hasPolarA = a.name.includes('폴라');
-            const hasPolarB = b.name.includes('폴라');
-            if (hasPolarA !== hasPolarB) return hasPolarA ? 1 : -1;
+            if (a.name.includes('폴라') !== b.name.includes('폴라')) return a.name.includes('폴라') ? 1 : -1;
             return a.name.localeCompare(b.name, 'ko');
         });
 
-        // UI 제어 (검색 시 "검색 결과" 제목 고정)
+        // 검색 상태 제목 고정
         if (keyword !== '') {
             document.getElementById('display-album-name').innerText = "검색 결과";
             document.getElementById('tab-wrapper').style.display = 'none';
@@ -607,15 +618,11 @@
             document.getElementById('tab-wrapper').style.display = 'flex';
             document.getElementById('display-album-name').innerText = currentAlbum;
             if (currentAlbum === '전체' || currentTab === '전체') sliderContainer.style.display = 'flex';
-            else {
-                sliderContainer.style.display = 'none';
-                document.documentElement.style.setProperty('--grid-cols', 2);
-                gridRange.value = 2;
-            }
+            else sliderContainer.style.display = 'none';
         }
 
         document.getElementById('tab-label').innerText = keyword ? `"${keyword}" 결과: ${filtered.length}건` : `전체 ${filtered.length}개의 포토카드`;
-        pcList.innerHTML = filtered.map(pc => createCardHTML(pc)).join('');
+        pcList.innerHTML = filtered.length > 0 ? filtered.map(pc => createCardHTML(pc)).join('') : `<div style="grid-column: span var(--grid-cols); padding: 100px 0; color:#bdc3c7; text-align:center;">데이터가 없습니다.</div>`;
     }
 
     function createCardHTML(pc) {
@@ -632,7 +639,8 @@
 
     function handlePcClick(e, url, id) {
         const now = new Date().getTime();
-        if (now - lastTapTime < 300 && now - lastTapTime > 0) goToCard(id);
+        const delta = now - lastTapTime;
+        if (delta < 300 && delta > 0) goToCard(id);
         else openModal(url, id);
         lastTapTime = now;
     }
@@ -641,7 +649,6 @@
         const modal = document.getElementById('image-modal');
         const modalImg = document.getElementById('modal-img');
         const modalName = document.getElementById('modal-pc-name');
-        const modalBookmark = document.getElementById('modal-bookmark-btn');
         const pc = pcData.find(item => item.id === id);
         if (!pc) return;
         currentViewingId = id; 
@@ -650,7 +657,7 @@
         modalName.innerText = pc.name;
         document.body.style.overflow = "hidden";
         updateModalBookmarkUI();
-        modalBookmark.onclick = (e) => { e.stopPropagation(); toggleBookmark(id); updateModalBookmarkUI(); };
+        document.getElementById('modal-bookmark-btn').onclick = (e) => { e.stopPropagation(); toggleBookmark(id); updateModalBookmarkUI(); };
         modalImg.onclick = (e) => {
             e.stopPropagation();
             const now = new Date().getTime();
@@ -677,7 +684,6 @@
         if (!pc) return;
         closeModal();
         currentAlbum = pc.album; currentTab = pc.category;
-        currentVer = pc.version || '전체'; currentFsType = pc.fsType || '전체';
         document.getElementById('result-area').style.display = 'block';
         document.getElementById('welcome-view').style.display = 'none';
         document.getElementById('search-bar').style.display = 'none';
@@ -705,10 +711,7 @@
         if (index > -1) bookmarks.splice(index, 1);
         else bookmarks.push(id);
         localStorage.setItem('jiwoo_bookmarks', JSON.stringify(bookmarks));
-        // 현재 보고 있는 상태(검색 혹은 탭) 유지하며 리프레시
-        const currentKeyword = searchInput.value;
-        if(document.getElementById('display-album-name').innerText === "내 북마크") showBookmarks();
-        else renderCards(currentKeyword);
+        renderCards(searchInput.value);
     }
 
     searchInput.addEventListener('input', (e) => {
@@ -718,14 +721,15 @@
             document.getElementById('result-area').style.display = 'block';
             renderCards(val);
         } else {
-            goHome();
+            document.getElementById('result-area').style.display = 'none';
+            document.getElementById('welcome-view').style.display = 'block';
         }
     });
 
     document.getElementById('search-toggle').onclick = () => {
         const bar = document.getElementById('search-bar');
         bar.style.display = (bar.style.display === 'block') ? 'none' : 'block';
-        if(bar.style.display === 'block') { searchInput.focus(); document.getElementById('welcome-view').style.display = 'none'; }
+        if(bar.style.display === 'block') searchInput.focus();
     };
 
     function showBookmarks() {
@@ -736,12 +740,10 @@
         sliderContainer.style.display = 'none';
         const bookmarkData = pcData.filter(pc => bookmarks.includes(pc.id));
         pcList.innerHTML = bookmarkData.map(pc => createCardHTML(pc)).join('');
-        document.getElementById('tab-label').innerText = `${bookmarkData.length}개의 북마크`;
     }
 
     function renderMenu() {
-        const menuListContainer = document.getElementById('menu-list-container');
-        menuListContainer.innerHTML = menuStructure.map((parent, index) => `
+        document.getElementById('menu-list-container').innerHTML = menuStructure.map((parent, index) => `
             <div class="menu-group">
                 <div class="menu-parent-row">
                     <span class="menu-parent-text" onclick="selectAlbum('${parent.name}')">${parent.name}</span>
