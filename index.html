@@ -53,19 +53,20 @@
         .menu-child-item { font-size: 0.8rem; color: #636e72; cursor: pointer; background: #f1f2f6; padding: 6px 14px; border-radius: 20px; }
 
         .main-content { padding: 20px; min-height: 80vh; }
-        .welcome { text-align: center; margin-top: 80px; }
+        .welcome { text-align: center; margin-top: 80px; animation: fadeIn 0.8s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .welcome p { color: #a4b0be; font-size: 0.95rem; }
         .bookmark-main-btn { 
             margin-top: 25px; padding: 12px 30px; border: none; background: var(--secondary); 
             color: #fff; border-radius: 50px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 15px rgba(255, 71, 87, 0.3);
         }
 
-        .search-bar-container { display: none; margin-bottom: 20px; }
+        .search-bar-container { display: none; margin-bottom: 20px; animation: fadeIn 0.4s; }
         .search-input-wrapper { position: relative; display: flex; align-items: center; }
         .search-input-wrapper i { position: absolute; left: 15px; color: #a4b0be; font-size: 0.9rem; }
         .search-input-wrapper input { width: 100%; padding: 12px 12px 12px 40px; border: 1px solid var(--border); border-radius: 12px; outline: none; background: #f9f9f9; }
 
-        #result-area { display: none; }
+        #result-area { display: none; animation: fadeIn 0.4s; }
         .album-title { font-size: 1.4rem; font-weight: 700; color: var(--primary); margin-bottom: 15px; }
         .tab-container { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
         .tab-btn { padding: 7px 14px; border: 1px solid var(--border); background: #fff; border-radius: 8px; cursor: pointer; font-size: 0.75rem; font-weight: 500; color: #7f8c8d; }
@@ -82,17 +83,18 @@
         .zoom-slider { -webkit-appearance: none; width: 80px; height: 4px; background: #dfe6e9; border-radius: 2px; outline: none; }
         .zoom-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; background: var(--primary); border-radius: 50%; cursor: pointer; }
 
+        /* [수정] 4배열 시 비율 버그 수정 */
         .card-grid { 
             display: grid; 
             grid-template-columns: repeat(var(--grid-cols), 1fr); 
-            grid-auto-rows: 1fr; 
             gap: 12px; 
             margin-top: 10px; 
+            align-items: start; /* 위쪽 정렬로 비율 유지 */
         }
         .card-item { 
             background: #fff; border-radius: 12px; border: 1px solid var(--border); 
             padding: 8px; display: flex; flex-direction: column; position: relative; 
-            box-shadow: var(--card-shadow); height: 100%;
+            box-shadow: var(--card-shadow); transition: transform 0.2s;
         }
         .card-image-wrapper { width: 100%; aspect-ratio: 5.5 / 8.5; border-radius: 8px; overflow: hidden; background: #f1f2f6; }
         .card-image-wrapper img { width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
@@ -210,9 +212,9 @@
 </div>
 
 <script>
-    // [중요] pcData 자리에 기존 313번까지의 데이터를 넣어주세요.
+    // [데이터 삽입구역] - 기존 313번까지의 데이터를 이 아래에 붙여넣으세요.
     const pcData = [
-{ id: '1', name: 'The Chase 지우 Photobook Ver.', album: 'The Chase', category: '앨범 포카', version: 'Photobook Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/photobook%20vers..jpg', info: '더체이스, 핑크색 배경, 네일, 깐머리, 노란색 옷' },
+    { id: '1', name: 'The Chase 지우 Photobook Ver.', album: 'The Chase', category: '앨범 포카', version: 'Photobook Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/photobook%20vers..jpg', info: '더체이스, 핑크색 배경, 네일, 깐머리, 노란색 옷' },
        { id: '2', name: 'The Chase 지우 Minibook Ver.', album: 'The Chase', category: '앨범 포카', version: 'Minibook Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/minibookver.jpg', info: '더체이스, 브이, 깐머리' },
  { id: '3', name: 'The Chase 지우 Package Ver.', album: 'The Chase', category: '앨범 포카', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/package%20ver..jpg', info: '더체이스, 앞머리, 초록색 옷' },
  { id: '4', name: 'The Chase 지우 메이크스타', album: 'The Chase', category: '예판 특전', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%A9%94%EC%9D%B4%ED%81%AC%20%EC%8A%A4%ED%83%80%20%EC%98%88%ED%8C%90%ED%8A%B9%EC%A0%84.jpg', info: '더체이스, 깐머리, 꽃받침, 윙크, 메이크스타' },
@@ -535,7 +537,6 @@
     const sliderContainer = document.getElementById('grid-slider-container');
     const gridRange = document.getElementById('grid-range');
 
-    // [복구 완료] 원래 카테고리들 전부 다시 채웠습니다.
     const menuStructure = [
         { name: '전체', children: [] },
         { name: 'The Chase', children: ['앨범 포카', '예판 특전', '럭키드로우', '팬싸 특전'] },
@@ -569,7 +570,6 @@
             return mAlb && mTab && mVer && mFs;
         });
 
-        // [정렬 로직 유지]
         filtered.sort((a, b) => {
             const albumKeywords = ['THE CHASE', 'STYLE', 'FOCUS', 'RUDE!'];
             const getAlbumPriority = (pc) => {
@@ -599,7 +599,6 @@
             return a.name.localeCompare(b.name, 'ko');
         });
 
-        // 검색 결과 제목 고정
         if (keyword !== '') {
             document.getElementById('display-album-name').innerText = "검색 결과";
             document.getElementById('tab-wrapper').style.display = 'none';
@@ -682,7 +681,7 @@
         document.getElementById('result-area').style.display = 'block';
         document.getElementById('welcome-view').style.display = 'none';
         document.getElementById('search-bar').style.display = 'none';
-        renderAlbumTabs(); // 탭 다시 그리기
+        renderAlbumTabs();
         renderCards();
         setTimeout(() => {
             const target = document.getElementById(`card-${id}`);
@@ -701,6 +700,22 @@
         document.getElementById('tab-wrapper').innerHTML = tabs.map(t => `<button class="tab-btn ${currentTab===t?'active':''}" onclick="currentTab='${t}'; renderCards()">${t}</button>`).join('');
     }
 
+    // [북마크 기능 복구] 인자값이 없을 때를 대비한 안전 로직 추가
+    function toggleBookmark(id) {
+        const index = bookmarks.indexOf(id);
+        if (index > -1) bookmarks.splice(index, 1);
+        else bookmarks.push(id);
+        localStorage.setItem('jiwoo_bookmarks', JSON.stringify(bookmarks));
+        
+        // 검색어가 있으면 검색 결과 유지, 없으면 현재 앨범/탭 유지
+        const currentKeyword = searchInput.value;
+        if(document.getElementById('display-album-name').innerText === "내 북마크") {
+            showBookmarks();
+        } else {
+            renderCards(currentKeyword); 
+        }
+    }
+
     searchInput.addEventListener('input', (e) => {
         const val = e.target.value.trim();
         if (val !== '') {
@@ -708,8 +723,7 @@
             document.getElementById('result-area').style.display = 'block';
             renderCards(val);
         } else {
-            document.getElementById('result-area').style.display = 'none';
-            document.getElementById('welcome-view').style.display = 'block';
+            goHome();
         }
     });
 
@@ -719,12 +733,15 @@
         if(bar.style.display === 'block') { searchInput.focus(); document.getElementById('welcome-view').style.display = 'none'; }
     };
 
-    function toggleBookmark(id) {
-        const index = bookmarks.indexOf(id);
-        if (index > -1) bookmarks.splice(index, 1);
-        else bookmarks.push(id);
-        localStorage.setItem('jiwoo_bookmarks', JSON.stringify(bookmarks));
-        renderCards(searchInput.value);
+    function showBookmarks() {
+        document.getElementById('welcome-view').style.display = 'none';
+        document.getElementById('result-area').style.display = 'block';
+        document.getElementById('display-album-name').innerText = "내 북마크";
+        document.getElementById('tab-wrapper').innerHTML = "";
+        sliderContainer.style.display = 'none';
+        const bookmarkData = pcData.filter(pc => bookmarks.includes(pc.id));
+        pcList.innerHTML = bookmarkData.map(pc => createCardHTML(pc)).join('');
+        document.getElementById('tab-label').innerText = `${bookmarkData.length}개의 북마크`;
     }
 
     function renderMenu() {
