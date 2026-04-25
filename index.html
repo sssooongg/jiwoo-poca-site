@@ -643,7 +643,7 @@ let bookmarks = JSON.parse(localStorage.getItem('jiwoo_bookmarks')) || [];
     ];
 
     // 슬라이더 작동 로직
-gridRange.max = 5; //
+gridRange.max = 4; //
     gridRange.addEventListener('input', (e) => {
         const val = e.target.value;
         document.documentElement.style.setProperty('--grid-cols', val);
