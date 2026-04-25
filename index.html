@@ -89,47 +89,42 @@
 
         .card-grid { display: grid; grid-template-columns: repeat(var(--grid-cols), 1fr); gap: 8px; margin-top: 10px; align-items: stretch; }
         .card-item { background: #fff; border-radius: 10px; border: 1px solid var(--border); padding: 6px; display: flex; flex-direction: column; position: relative; box-shadow: var(--card-shadow); transition: transform 0.2s; }
-        
-        /* [유지] 이미지 비율 고정 */
         .card-image-wrapper { width: 100%; aspect-ratio: 5.5 / 8.5; border-radius: 6px; overflow: hidden; background: #f1f2f6; }
         .card-image-wrapper img { width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
         
-        /* [수정] 기본 글씨 크기 및 여백 조정 (위아래 잘림 방지) */
         .card-name { 
             font-size: 0.7rem; font-weight: 700; color: #2d3436; 
             margin: 6px 0 1px; text-align: center; 
-            height: 3em; line-height: 1.1; /* line-height 줄여서 여백 확보 */
+            height: 3em; line-height: 1.1; 
             word-break: keep-all; 
             display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
             overflow: hidden;
             display: flex; align-items: center; justify-content: center;
         }
 
-        /* [수정] 4배열 시 북마크 크기 축소 */
         .card-bookmark-btn { 
             position: absolute; top: 8px; right: 8px; 
             background: rgba(255,255,255,0.8); border: none; cursor: pointer; 
             color: #dfe6e9; z-index: 5; 
-            width: 26px; height: 26px; /* 크기 줄임 */
+            width: 26px; height: 26px;
             border-radius: 50%; display: flex; align-items: center; justify-content: center; 
-            backdrop-filter: blur(4px); font-size: 0.9rem; /* 아이콘 크기 줄임 */
+            backdrop-filter: blur(4px); font-size: 0.9rem;
         }
         .card-bookmark-btn.active { color: var(--secondary); background: #fff; }
 
-        /* [수정] 3배열 이상일 때 최적화 (글씨 더 작게, 북마크 더 작게) */
         .grid-3-plus .card-item { padding: 4px; border-radius: 8px; }
         .grid-3-plus .card-image-wrapper { border-radius: 4px; }
         .grid-3-plus .card-name { 
-            font-size: 0.55rem; /* 글씨 크기 대폭 축소 */
+            font-size: 0.55rem; 
             height: 3em;
             margin: 4px 0 1px;
-            letter-spacing: -0.03em; /* 자간 줄여서 꽉 차보이게 */
-            line-height: 1; /* 높이 꽉 차게 */
+            letter-spacing: -0.03em;
+            line-height: 1;
         }
         .grid-3-plus .card-bookmark-btn { 
             top: 5px; right: 5px; 
-            width: 20px; height: 20px; /* 북마크 크기 대폭 축소 */
-            font-size: 0.7rem; /* 아이콘 크기 대폭 축소 */
+            width: 20px; height: 20px;
+            font-size: 0.7rem;
         }
 
         .modal { display: none; position: fixed; z-index: 4000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; }
@@ -166,7 +161,7 @@
         <div id="welcome-view" class="welcome">
             <p>메뉴를 선택해 포토카드를 확인하세요</p>
             <button class="bookmark-main-btn" onclick="showBookmarks()">
-                <i class="fas fa-heart"></i> 내 북마크 보기
+                <i class="fas fa-heart"></i> WISHLIST 보기
             </button>
         </div>
 
@@ -506,8 +501,8 @@
 { id: '296', name: '지우 Hearts2House 맨투맨', album: 'MD 포카', category: 'Hearts2House', version: 'Package Ver.', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/hearts2house%20%EB%A7%A8%ED%88%AC%EB%A7%A8.jpg', info: '팬미팅, 엠디포카, 셔츠, 교복, 여친짤, 앞머리, 볼, 앙, 볼찌빵' },
 { id: '297', name: '지우 2026 시즌그리팅 뮤직앤드라마 폴라', album: 'MD 포카', category: '시즌그리팅', version: 'Package Ver.', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/2026%20%EC%8B%9C%EA%B7%B8%20%EB%AE%A4%EC%A7%81%EC%95%A4%EB%93%9C%EB%9D%BC%EB%A7%88.jpg', info: 'seasongreetings, 폴라포카, 잔머리, 턱받침' },
 { id: '298', name: 'The Chase 지우 케이엠스테이션 3.0', album: 'The Chase', category: '팬싸 특전', fsType: '영통', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%8D%94%EC%B2%B4%20kmstation%20%EC%98%81%ED%86%B5%203.0.jpg', info: '더체이스, kmstation, 브이, 윙크, 깐머리' },
-{ id: '299', name: 'RUDE 지우 큐큐뮤직 4성', album: 'RUDE!', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-59d385dbb45942d9b7b27b48f5c9c818.r2.dev/%EB%A3%A8%EB%93%9C%20%ED%81%90%ED%81%90%EB%AE%A4%EC%A7%81%204%EC%84%B1.jpg', info: '루드, qqmusic, 앞머리, 윙크' },
-{ id: '300', name: 'RUDE 지우 큐큐뮤직 3성', album: 'RUDE!', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-59d385dbb45942d9b7b27b48f5c9c818.r2.dev/%EB%A3%A8%EB%93%9C%20%ED%81%90%ED%81%90%EB%AE%A4%EC%A7%81%203%EC%84%B1.jpg', info: '루드, qqmusic, 앞머리, 셔츠' },
+{ id: '299', name: 'RUDE! 지우 큐큐뮤직 4성', album: 'RUDE!', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-59d385dbb45942d9b7b27b48f5c9c818.r2.dev/%EB%A3%A8%EB%93%9C%20%ED%81%90%ED%81%90%EB%AE%A4%EC%A7%81%204%EC%84%B1.jpg', info: '루드, qqmusic, 앞머리, 윙크' },
+{ id: '300', name: 'RUDE! 지우 큐큐뮤직 3성', album: 'RUDE!', category: '럭키드로우', fsType: '대면', imgUrl: 'https://pub-59d385dbb45942d9b7b27b48f5c9c818.r2.dev/%EB%A3%A8%EB%93%9C%20%ED%81%90%ED%81%90%EB%AE%A4%EC%A7%81%203%EC%84%B1.jpg', info: '루드, qqmusic, 앞머리, 셔츠' },
 { id: '301', name: 'FOCUS 지우 방콕', album: 'FOCUS', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EB%B0%A9%EC%BD%95%20%EB%8C%80%EB%A9%B4.jpg', info: '포커스, 대면팬싸, 더티워크착, 쇄골, 볼하트' },
 { id: '302', name: 'FOCUS 지우 방콕 카페 이벤트', album: 'FOCUS', category: '팬싸 특전', fsType: '대면', imgUrl: 'https://pub-e1ecd0726b2a4173876f5bd645496ea6.r2.dev/%ED%8F%AC%EC%BB%A4%EC%8A%A4%20%EB%B0%A9%EC%BD%95%20%EC%B9%B4%ED%8E%98%EC%9D%B4%EB%B2%A4%ED%8A%B8.jpg', info: '포커스, 대면팬싸, 반묶음, 공주' },
 { id: '303', name: '지우 테레카 2025 케이팝 루키 베이스', album: '기타', category: 'TELECA 2025 KPOP ROOKIE', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%ED%85%8C%EB%A0%88%EC%B9%B4%201.jpg', info: 'teleca, 교복, 리본넥타이' },
@@ -549,6 +544,8 @@
 
     function renderCards() {
         const keyword = searchInput.value.trim().toLowerCase();
+        const searchBarVisible = document.getElementById('search-bar').style.display === 'block';
+
         let filtered = pcData.filter(pc => {
             if (keyword !== '') {
                 return pc.name.toLowerCase().includes(keyword) || (pc.info && pc.info.toLowerCase().includes(keyword));
@@ -595,19 +592,26 @@
             return cleanA.localeCompare(cleanB, 'ko', { numeric: true });
         });
 
-        if (keyword !== '') {
-            document.getElementById('display-album-name').style.display = "none";
+        const tabLabel = document.getElementById('tab-label');
+        const albumTitle = document.getElementById('display-album-name');
+
+        if (searchBarVisible) {
+            albumTitle.style.display = "none";
             document.getElementById('tab-wrapper').style.display = "none";
             document.getElementById('version-filter').style.display = "none";
             document.getElementById('fansign-filter').style.display = "none";
+            // [수정] 검색바가 열려있을 때도 총 개수는 보여줌
+            tabLabel.style.display = "block";
+            tabLabel.innerText = `총 ${filtered.length}장`;
         } else {
-            document.getElementById('display-album-name').style.display = "block";
-            document.getElementById('display-album-name').innerText = currentAlbum || "전체 포카";
+            albumTitle.style.display = "block";
+            albumTitle.innerText = (currentAlbum === '전체' || currentAlbum === '') ? "전체 포카" : currentAlbum;
             document.getElementById('tab-wrapper').style.display = "flex";
+            tabLabel.style.display = "block";
+            tabLabel.innerText = `총 ${filtered.length}장`;
         }
 
-        document.getElementById('grid-slider-container').style.display = (keyword || currentAlbum !== '') ? 'flex' : 'none';
-        document.getElementById('tab-label').innerText = `총 ${filtered.length}장`;
+        document.getElementById('grid-slider-container').style.display = (keyword || currentAlbum !== '' || searchBarVisible) ? 'flex' : 'none';
         pcList.innerHTML = filtered.map(pc => createCardHTML(pc)).join('');
     }
 
@@ -688,8 +692,7 @@
             const target = document.getElementById(`card-${id}`);
             if (target) {
                 const headerOffset = 70;
-                const elementPosition = target.getBoundingClientRect().top;
-                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                const offsetPosition = target.getBoundingClientRect().top + window.pageYOffset - headerOffset;
                 window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
                 target.classList.add('highlight-card');
                 setTimeout(() => target.classList.remove('highlight-card'), 2000);
@@ -707,7 +710,7 @@
         const fFilter = document.getElementById('fansign-filter');
         vFilter.style.display = 'none'; fFilter.style.display = 'none';
 
-        if (searchInput.value.trim() === '') {
+        if (searchInput.value.trim() === '' && document.getElementById('search-bar').style.display !== 'block') {
             if (currentTab.includes('앨범') && (currentAlbum === 'The Chase' || currentAlbum === 'FOCUS')) {
                 vFilter.style.display = 'block';
                 let vers = ['전체'];
@@ -746,10 +749,15 @@
     document.getElementById('search-toggle').onclick = () => {
         closeMenu(); 
         const bar = document.getElementById('search-bar');
-        bar.style.display = 'block';
-        searchInput.focus(); 
-        document.getElementById('welcome-view').style.display = 'none';
-        document.getElementById('result-area').style.display = 'block';
+        if (bar.style.display === 'block') {
+            bar.style.display = 'none';
+            searchInput.value = '';
+        } else {
+            bar.style.display = 'block';
+            searchInput.focus(); 
+            document.getElementById('welcome-view').style.display = 'none';
+            document.getElementById('result-area').style.display = 'block';
+        }
         renderCards();
     };
 
@@ -762,7 +770,9 @@
         document.getElementById('tab-wrapper').innerHTML = "";
         const data = pcData.filter(pc => bookmarks.includes(pc.id));
         pcList.innerHTML = data.map(pc => createCardHTML(pc)).join('');
-        document.getElementById('tab-label').innerText = `총 ${data.length}장`;
+        const tabLabel = document.getElementById('tab-label');
+        tabLabel.style.display = "block";
+        tabLabel.innerText = `총 ${data.length}장`;
         document.getElementById('grid-slider-container').style.display = 'flex';
     }
 
@@ -782,11 +792,6 @@
         const submenu = document.getElementById(`sub-${index}`);
         submenu.style.display = (submenu.style.display === 'flex') ? 'none' : 'flex';
         btn.classList.toggle('active');
-    }
-
-    function closeMenu() {
-        document.getElementById('toc-menu').style.display = 'none';
-        document.body.classList.remove('menu-open');
     }
 
     document.getElementById('menu-toggle').onclick = () => {
