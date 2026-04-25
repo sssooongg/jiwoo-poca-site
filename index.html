@@ -116,12 +116,15 @@
         }
 
         /* [수정] 동적 가로 배열 시스템 */
-        .card-grid { 
-            display: grid; 
-            grid-template-columns: repeat(var(--grid-cols), 1fr); 
-            gap: calc(20px / var(--grid-cols)); 
-            margin-top: 10px; 
-        }
+       .card-grid {
+    display: grid !important;
+    /* minmax(0, 1fr)을 써야 화면이 좁아도 무조건 5등분을 합니다 */
+    grid-template-columns: repeat(var(--grid-cols, 2), minmax(0, 1fr)) !important;
+    grid-auto-rows: max-content !important; 
+    gap: 6px !important; /* 간격을 좁혀서 공간 확보 */
+    width: 100% !important;
+    align-items: start !important;
+}
 
         .card-item { 
             background: #fff; border-radius: 12px; border: 1px solid var(--border); 
@@ -129,11 +132,25 @@
             box-shadow: var(--card-shadow);
         }
         
-        .card-image-wrapper { 
-            width: 100%; aspect-ratio: 55 / 88; border-radius: 8px; overflow: hidden; 
-            background: #f1f2f6; position: relative;
-        }
-        .card-image-wrapper img { width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
+.card-image-wrapper {
+    width: 100% !important;
+    aspect-ratio: 5.5 / 8.5 !important; /* 포카 표준 비율 고정 */
+    background-color: #f1f2f6;
+    border-radius: 6px;
+    overflow: hidden !important;
+    position: relative;
+}
+
+.card-image-wrapper img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important; /* 이미지가 찌그러지지 않게 */
+}
+
+/* 5열일 때 텍스트와 여백 최소화 */
+.grid-5-plus .card-item {
+    padding: 3px !important;
+}
         
         .card-name { font-size: 0.85rem; font-weight: 700; color: #2d3436; margin: 10px 0 4px; text-align: center; }
         
@@ -838,7 +855,21 @@ gridRange.max = 5; //
         document.documentElement.style.setProperty('--grid-cols', 2);
         pcList.classList.remove('grid-3-plus');
     }
-  
+  const val = gridRange.value;
+    pcList.classList.remove('grid-3-plus', 'grid-5-plus');
+    
+    // 전체, MD 포카, 유닛 포카 등에서도 슬라이더가 보이도록 설정
+    const isSliderMenu = ['전체', 'MD 포카', '유닛 포카'].includes(currentAlbum) || currentTab === '전체' || keyword !== '';
+
+    if (isSliderMenu) {
+        sliderContainer.style.display = 'flex';
+        document.documentElement.style.setProperty('--grid-cols', val);
+        if (val >= 5) pcList.classList.add('grid-5-plus');
+        else if (val >= 3) pcList.classList.add('grid-3-plus');
+    } else {
+        sliderContainer.style.display = 'none';
+        document.documentElement.style.setProperty('--grid-cols', 2);
+    }
 
         // 4. 화면 렌더링
         document.getElementById('tab-label').innerText = keyword ? `"${keyword}" 결과: ${filtered.length}건` : `전체 ${filtered.length}개의 포토카드`;
