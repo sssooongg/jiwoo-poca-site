@@ -20,7 +20,6 @@
             --grid-cols: 2;
         }
 
-        /* 기본 리셋 */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         html, body { 
@@ -54,20 +53,19 @@
         .menu-child-item { font-size: 0.8rem; color: #636e72; cursor: pointer; background: #f1f2f6; padding: 6px 14px; border-radius: 20px; }
 
         .main-content { padding: 20px; min-height: 80vh; }
-        .welcome { text-align: center; margin-top: 80px; animation: fadeIn 0.8s; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .welcome { text-align: center; margin-top: 80px; }
         .welcome p { color: #a4b0be; font-size: 0.95rem; }
         .bookmark-main-btn { 
             margin-top: 25px; padding: 12px 30px; border: none; background: var(--secondary); 
             color: #fff; border-radius: 50px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 15px rgba(255, 71, 87, 0.3);
         }
 
-        .search-bar-container { display: none; margin-bottom: 20px; animation: fadeIn 0.4s; }
+        .search-bar-container { display: none; margin-bottom: 20px; }
         .search-input-wrapper { position: relative; display: flex; align-items: center; }
         .search-input-wrapper i { position: absolute; left: 15px; color: #a4b0be; font-size: 0.9rem; }
         .search-input-wrapper input { width: 100%; padding: 12px 12px 12px 40px; border: 1px solid var(--border); border-radius: 12px; outline: none; background: #f9f9f9; }
 
-        #result-area { display: none; animation: fadeIn 0.4s; }
+        #result-area { display: none; }
         .album-title { font-size: 1.4rem; font-weight: 700; color: var(--primary); margin-bottom: 15px; }
         .tab-container { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
         .tab-btn { padding: 7px 14px; border: 1px solid var(--border); background: #fff; border-radius: 8px; cursor: pointer; font-size: 0.75rem; font-weight: 500; color: #7f8c8d; }
@@ -84,11 +82,10 @@
         .zoom-slider { -webkit-appearance: none; width: 80px; height: 4px; background: #dfe6e9; border-radius: 2px; outline: none; }
         .zoom-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; background: var(--primary); border-radius: 50%; cursor: pointer; }
 
-        /* 비율 버그 수정된 카드 그리드 */
         .card-grid { 
             display: grid; 
             grid-template-columns: repeat(var(--grid-cols), 1fr); 
-            grid-auto-rows: min-content; /* 세로 길이 들쭉날쭉 방지 */
+            grid-auto-rows: 1fr; 
             gap: 12px; 
             margin-top: 10px; 
         }
@@ -97,13 +94,7 @@
             padding: 8px; display: flex; flex-direction: column; position: relative; 
             box-shadow: var(--card-shadow); height: 100%;
         }
-        .card-image-wrapper { 
-            width: 100%; 
-            aspect-ratio: 5.5 / 8.5; /* 비율 고정 */
-            border-radius: 8px; 
-            overflow: hidden; 
-            background: #f1f2f6; 
-        }
+        .card-image-wrapper { width: 100%; aspect-ratio: 5.5 / 8.5; border-radius: 8px; overflow: hidden; background: #f1f2f6; }
         .card-image-wrapper img { width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
         .card-name { font-size: 0.85rem; font-weight: 700; color: #2d3436; margin: 10px 0 4px; text-align: center; word-break: keep-all; }
 
@@ -117,7 +108,6 @@
         }
         .card-bookmark-btn.active { color: var(--secondary); background: #fff; }
 
-        /* 모달 스타일 */
         .modal {
             display: none; position: fixed; z-index: 3000; top: 0; left: 0; width: 100%; height: 100%; 
             background-color: rgba(0, 0, 0, 0.9); justify-content: center; align-items: center;
@@ -144,7 +134,6 @@
             backdrop-filter: blur(5px); z-index: 3200; white-space: nowrap;
         }
 
-        /* 이동 강조 효과 */
         @keyframes highlight-glow {
             0% { transform: scale(1); box-shadow: 0 0 0px var(--primary); }
             50% { transform: scale(1.08); box-shadow: 0 0 25px var(--primary); border-color: var(--primary); }
@@ -221,9 +210,9 @@
 </div>
 
 <script>
-    // 데이터는 그대로 유지됨
+    // [중요] pcData 자리에 기존 313번까지의 데이터를 넣어주세요.
     const pcData = [
-   { id: '1', name: 'The Chase 지우 Photobook Ver.', album: 'The Chase', category: '앨범 포카', version: 'Photobook Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/photobook%20vers..jpg', info: '더체이스, 핑크색 배경, 네일, 깐머리, 노란색 옷' },
+{ id: '1', name: 'The Chase 지우 Photobook Ver.', album: 'The Chase', category: '앨범 포카', version: 'Photobook Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/photobook%20vers..jpg', info: '더체이스, 핑크색 배경, 네일, 깐머리, 노란색 옷' },
        { id: '2', name: 'The Chase 지우 Minibook Ver.', album: 'The Chase', category: '앨범 포카', version: 'Minibook Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/minibookver.jpg', info: '더체이스, 브이, 깐머리' },
  { id: '3', name: 'The Chase 지우 Package Ver.', album: 'The Chase', category: '앨범 포카', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/package%20ver..jpg', info: '더체이스, 앞머리, 초록색 옷' },
  { id: '4', name: 'The Chase 지우 메이크스타', album: 'The Chase', category: '예판 특전', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/%EB%A9%94%EC%9D%B4%ED%81%AC%20%EC%8A%A4%ED%83%80%20%EC%98%88%ED%8C%90%ED%8A%B9%EC%A0%84.jpg', info: '더체이스, 깐머리, 꽃받침, 윙크, 메이크스타' },
@@ -536,26 +525,17 @@
 { id: '311', name: '지우 테레카 2025 케이팝 루키 스케치', album: '기타', category: 'TELECA 2025 KPOP ROOKIE', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%ED%85%8C%EB%A0%88%EC%B9%B4%20%EC%8A%A4%EC%BC%80%EC%B9%98.jpg', info: 'teleca, 교복, 강아지, 책상, 집, istj' },
 { id: '312', name: '지우 테레카 2025 케이팝 루키 베이스', album: '기타', category: 'TELECA 2025 KPOP ROOKIE', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%ED%85%8C%EB%A0%88%EC%B9%B4%20%EB%8B%A8%EC%B2%B4%201.jpg', info: 'teleca, 단체, 교복' },
 { id: '313', name: '지우 테레카 2025 케이팝 루키 베이스', album: '기타', category: 'TELECA 2025 KPOP ROOKIE', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%ED%85%8C%EB%A0%88%EC%B9%B4%20%EB%8B%A8%EC%B2%B4%202.jpg', info: 'teleca, 단체, 나그랑티' },
-
     ];
 
     let bookmarks = JSON.parse(localStorage.getItem('jiwoo_bookmarks')) || [];
-    let currentAlbum = '';
-    let currentTab = '';
-    let currentViewingId = null;
-    let lastTapTime = 0; // 모바일 더블탭 구현용
+    let currentAlbum = '', currentTab = '', currentVer = '전체', currentFsType = '전체', currentViewingId = null, lastTapTime = 0;
 
-    const menuToggle = document.getElementById('menu-toggle');
-    const tocMenu = document.getElementById('toc-menu');
-    const mainView = document.getElementById('main-view');
-    const menuListContainer = document.getElementById('menu-list-container');
     const pcList = document.getElementById('pc-list');
-    const searchToggle = document.getElementById('search-toggle');
-    const searchBar = document.getElementById('search-bar');
     const searchInput = document.getElementById('search-input');
-    const gridRange = document.getElementById('grid-range');
     const sliderContainer = document.getElementById('grid-slider-container');
+    const gridRange = document.getElementById('grid-range');
 
+    // [복구 완료] 원래 카테고리들 전부 다시 채웠습니다.
     const menuStructure = [
         { name: '전체', children: [] },
         { name: 'The Chase', children: ['앨범 포카', '예판 특전', '럭키드로우', '팬싸 특전'] },
@@ -563,74 +543,18 @@
         { name: 'FOCUS', children: ['앨범 포카', '예판 특전', '럭키드로우', '팬싸 특전'] },
         { name: 'RUDE!', children: ['럭키드로우', '기타'] },
         { name: '유닛 포카', children: ['The Chase', 'STYLE', 'FOCUS', 'RUDE!', '기타'] },
-        { name: 'MD 포카', children: ['The Chase', 'STYLE', 'FOCUS', '시즌그리팅', 'Hearts2House'] },
-        { name: '기타', children: ['메가 커피', 'SUPER STAR SM', 'SMT 25', '국민은행'] }
+        { name: 'MD 포카', children: ['The Chase', 'STYLE', 'FOCUS', '1st ANNIVERSARY', 'Four Hearts Club', '티니핑', '시즌그리팅', 'Hearts2House', '응원봉', 'BIRTHDAY'] },
+        { name: '기타', children: ['메가 커피', 'SUPER STAR SM', 'SMT 25', 'BARENBLISS', '2aN', 'scarlett', 'TELECA 2025 KPOP ROOKIE', 'SM 30th', '국민은행', 'LILY BROWN'] }
     ];
 
     gridRange.max = 4;
     gridRange.addEventListener('input', (e) => {
-        const val = e.target.value;
-        document.documentElement.style.setProperty('--grid-cols', val);
-        if(val >= 3) pcList.classList.add('grid-3-plus');
+        document.documentElement.style.setProperty('--grid-cols', e.target.value);
+        if(e.target.value >= 3) pcList.classList.add('grid-3-plus');
         else pcList.classList.remove('grid-3-plus');
     });
 
-    function goHome() {
-        tocMenu.style.display = 'none';
-        mainView.style.display = 'block';
-        searchBar.style.display = 'none';
-        sliderContainer.style.display = 'none';
-        document.getElementById('welcome-view').style.display = 'block';
-        document.getElementById('result-area').style.display = 'none';
-        menuToggle.querySelector('i').className = 'fas fa-bars';
-    }
-
-    function renderMenu() {
-        menuListContainer.innerHTML = menuStructure.map((parent, index) => `
-            <div class="menu-group">
-                <div class="menu-parent-row">
-                    <span class="menu-parent-text" onclick="selectAlbum('${parent.name}')">${parent.name}</span>
-                    ${parent.children.length > 0 ? `<div class="toggle-btn" onclick="toggleSubMenu(this, ${index})"><i class="fas fa-chevron-down"></i></div>` : ''}
-                </div>
-                ${parent.children.length > 0 ? `<ul class="menu-child-list" id="submenu-${index}" style="display:none;">${parent.children.map(child => `<li class="menu-child-item" onclick="selectFromMenu('${parent.name}', '${child}')">${child}</li>`).join('')}</ul>` : ''}
-            </div>
-        `).join('');
-    }
-
-    function toggleSubMenu(btn, index) {
-        const submenu = document.getElementById(`submenu-${index}`);
-        const isVisible = submenu.style.display === 'flex';
-        submenu.style.display = isVisible ? 'none' : 'flex';
-        btn.classList.toggle('active', !isVisible);
-    }
-
-    function selectFromMenu(p, c) { selectAlbum(p); changeTab(null, c); }
-
-    function selectAlbum(name) {
-        tocMenu.style.display = 'none';
-        mainView.style.display = 'block';
-        searchBar.style.display = 'none';
-        document.getElementById('welcome-view').style.display = 'none';
-        document.getElementById('result-area').style.display = 'block';
-        document.getElementById('display-album-name').innerText = name;
-        currentAlbum = name;
-        
-        let tabs = ['전체'];
-        const findMenu = menuStructure.find(m => m.name === name);
-        if (findMenu) tabs = tabs.concat(findMenu.children);
-        document.getElementById('tab-wrapper').innerHTML = tabs.map(t => `<button class="tab-btn" onclick="changeTab(this, '${t}')">${t}</button>`).join('');
-        changeTab(null, '전체');
-        menuToggle.querySelector('i').className = 'fas fa-bars';
-    }
-
-    function changeTab(el, cat) {
-        document.querySelectorAll('.tab-btn').forEach(b => {
-            if(b.innerText.trim() === cat.trim()) b.classList.add('active');
-            else b.classList.remove('active');
-        });
-        currentTab = cat;
-        renderCards();
-    }
+    function goHome() { location.reload(); }
 
     function renderCards(keyword = '') {
         let filtered = pcData.filter(pc => {
@@ -640,27 +564,55 @@
             }
             const mAlb = currentAlbum === '전체' || pc.album === currentAlbum;
             const mTab = currentTab === '전체' || pc.category === currentTab;
-            return mAlb && mTab;
+            const mVer = currentVer === '전체' || pc.version === currentVer;
+            const mFs = currentFsType === '전체' || pc.fsType === currentFsType;
+            return mAlb && mTab && mVer && mFs;
         });
 
+        // [정렬 로직 유지]
+        filtered.sort((a, b) => {
+            const albumKeywords = ['THE CHASE', 'STYLE', 'FOCUS', 'RUDE!'];
+            const getAlbumPriority = (pc) => {
+                const fullText = (pc.album + pc.name).toUpperCase();
+                for (let i = 0; i < albumKeywords.length; i++) {
+                    if (fullText.includes(albumKeywords[i])) return i;
+                }
+                if (pc.album === '유닛 포카') return 4;
+                if (pc.album === 'MD 포카') return 5;
+                return 6;
+            };
+            const priA = getAlbumPriority(a);
+            const priB = getAlbumPriority(b);
+            if (priA !== priB) return priA - priB;
+            const categoryOrder = { '앨범 포카': 1, '예판 특전': 2, '럭키드로우': 3, '팬싸 특전': 4 };
+            const catA = categoryOrder[a.category] || 5;
+            const catB = categoryOrder[b.category] || 5;
+            if (catA !== catB) return catA - catB;
+            const cleanA = a.name.replace(/폴라/g, '').replace(/\s+/g, ' ').trim();
+            const cleanB = b.name.replace(/폴라/g, '').replace(/\s+/g, ' ').trim();
+            if (cleanA !== cleanB) {
+                return cleanA.localeCompare(cleanB, 'ko', { numeric: true });
+            }
+            const hasPolarA = a.name.includes('폴라');
+            const hasPolarB = b.name.includes('폴라');
+            if (hasPolarA !== hasPolarB) return hasPolarA ? 1 : -1;
+            return a.name.localeCompare(b.name, 'ko');
+        });
+
+        // 검색 결과 제목 고정
         if (keyword !== '') {
-            // [검색 시 제목 강제 고정]
             document.getElementById('display-album-name').innerText = "검색 결과";
             document.getElementById('tab-wrapper').style.display = 'none';
             sliderContainer.style.display = 'flex';
         } else {
             document.getElementById('tab-wrapper').style.display = 'flex';
+            document.getElementById('display-album-name').innerText = currentAlbum;
             if (currentAlbum === '전체' || currentTab === '전체') sliderContainer.style.display = 'flex';
-            else {
-                sliderContainer.style.display = 'none';
-                document.documentElement.style.setProperty('--grid-cols', 2);
-                gridRange.value = 2;
-                pcList.classList.remove('grid-3-plus');
-            }
+            else sliderContainer.style.display = 'none';
         }
 
         document.getElementById('tab-label').innerText = keyword ? `"${keyword}" 결과: ${filtered.length}건` : `전체 ${filtered.length}개의 포토카드`;
-        pcList.innerHTML = filtered.length > 0 ? filtered.map(pc => createCardHTML(pc)).join('') : `<div style="grid-column: span var(--grid-cols); padding: 100px 0; color:#bdc3c7; text-align:center;">데이터가 없습니다.</div>`;
+        pcList.innerHTML = filtered.map(pc => createCardHTML(pc)).join('');
     }
 
     function createCardHTML(pc) {
@@ -668,7 +620,6 @@
         const imgTag = pc.imgUrl ? 
             `<img src="${pc.imgUrl}" alt="${pc.name}" onclick="handlePcClick(event, '${pc.imgUrl}', '${pc.id}')">` : 
             `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#dfe6e9;"><i class="fas fa-image fa-2x"></i></div>`;
-        
         return `
             <div class="card-item" id="card-${pc.id}">
                 <button class="card-bookmark-btn ${isBookmarked ? 'active' : ''}" onclick="toggleBookmark('${pc.id}')"><i class="${isBookmarked ? 'fas' : 'far'} fa-heart"></i></button>
@@ -678,19 +629,11 @@
         `;
     }
 
-    // 모바일 더블탭 감지를 위한 커스텀 클릭 핸들러
     function handlePcClick(e, url, id) {
-        const currentTime = new Date().getTime();
-        const tapLength = currentTime - lastTapTime;
-        
-        if (tapLength < 300 && tapLength > 0) {
-            // 더블클릭(탭) 발생
-            goToCard(id);
-        } else {
-            // 단일 클릭 - 모달 열기
-            openModal(url, id);
-        }
-        lastTapTime = currentTime;
+        const now = new Date().getTime();
+        if (now - lastTapTime < 300 && now - lastTapTime > 0) goToCard(id);
+        else openModal(url, id);
+        lastTapTime = now;
     }
 
     function openModal(url, id) {
@@ -698,30 +641,20 @@
         const modalImg = document.getElementById('modal-img');
         const modalName = document.getElementById('modal-pc-name');
         const modalBookmark = document.getElementById('modal-bookmark-btn');
-        
         const pc = pcData.find(item => item.id === id);
         if (!pc) return;
-
         currentViewingId = id; 
         modal.style.display = "flex";
         modalImg.src = url;
         modalName.innerText = pc.name;
         document.body.style.overflow = "hidden";
-
         updateModalBookmarkUI();
-
-        modalBookmark.onclick = (e) => {
-            e.stopPropagation();
-            toggleBookmark(id);
-            updateModalBookmarkUI();
-        };
-
-        // 모달 안에서도 이미지 더블탭 시 이동 가능하게
+        modalBookmark.onclick = (e) => { e.stopPropagation(); toggleBookmark(id); updateModalBookmarkUI(); };
         modalImg.onclick = (e) => {
             e.stopPropagation();
-            const currentTime = new Date().getTime();
-            if (currentTime - lastTapTime < 300) goToCard(id);
-            lastTapTime = currentTime;
+            const now = new Date().getTime();
+            if (now - lastTapTime < 300) goToCard(id);
+            lastTapTime = now;
         };
     }
 
@@ -739,70 +672,94 @@
     }
 
     function goToCard(id) {
-        if (!id) return;
-        document.getElementById('image-modal').style.display = "none";
-        document.body.style.overflow = "auto";
-        
+        const pc = pcData.find(p => p.id === id);
+        if (!pc) return;
+        closeModal();
+        currentAlbum = pc.album;
+        currentTab = pc.category;
+        currentVer = pc.version || '전체';
+        currentFsType = pc.fsType || '전체';
+        document.getElementById('result-area').style.display = 'block';
+        document.getElementById('welcome-view').style.display = 'none';
+        document.getElementById('search-bar').style.display = 'none';
+        renderAlbumTabs(); // 탭 다시 그리기
+        renderCards();
         setTimeout(() => {
-            const targetCard = document.getElementById(`card-${id}`);
-            if (targetCard) {
-                const offset = 100;
-                const elementPosition = targetCard.getBoundingClientRect().top + window.pageYOffset;
-                window.scrollTo({ top: elementPosition - offset, behavior: 'smooth' });
-                targetCard.classList.add('highlight-card');
-                setTimeout(() => targetCard.classList.remove('highlight-card'), 1600);
+            const target = document.getElementById(`card-${id}`);
+            if (target) {
+                window.scrollTo({ top: target.getBoundingClientRect().top + window.pageYOffset - 100, behavior: 'smooth' });
+                target.classList.add('highlight-card');
+                setTimeout(() => target.classList.remove('highlight-card'), 2000);
             }
-        }, 150);
+        }, 300);
     }
 
-    function showBookmarks() {
-        document.getElementById('welcome-view').style.display = 'none';
-        document.getElementById('result-area').style.display = 'block';
-        document.getElementById('display-album-name').innerText = "내 북마크";
-        const bookmarkData = pcData.filter(pc => bookmarks.includes(pc.id));
-        pcList.innerHTML = bookmarkData.map(pc => createCardHTML(pc)).join('');
-        document.getElementById('tab-label').innerText = `${bookmarkData.length}개의 북마크`;
+    function renderAlbumTabs() {
+        let tabs = ['전체'];
+        const findMenu = menuStructure.find(m => m.name === currentAlbum);
+        if (findMenu) tabs = tabs.concat(findMenu.children);
+        document.getElementById('tab-wrapper').innerHTML = tabs.map(t => `<button class="tab-btn ${currentTab===t?'active':''}" onclick="currentTab='${t}'; renderCards()">${t}</button>`).join('');
     }
+
+    searchInput.addEventListener('input', (e) => {
+        const val = e.target.value.trim();
+        if (val !== '') {
+            document.getElementById('welcome-view').style.display = 'none';
+            document.getElementById('result-area').style.display = 'block';
+            renderCards(val);
+        } else {
+            document.getElementById('result-area').style.display = 'none';
+            document.getElementById('welcome-view').style.display = 'block';
+        }
+    });
+
+    document.getElementById('search-toggle').onclick = () => {
+        const bar = document.getElementById('search-bar');
+        bar.style.display = (bar.style.display === 'block') ? 'none' : 'block';
+        if(bar.style.display === 'block') { searchInput.focus(); document.getElementById('welcome-view').style.display = 'none'; }
+    };
 
     function toggleBookmark(id) {
         const index = bookmarks.indexOf(id);
         if (index > -1) bookmarks.splice(index, 1);
         else bookmarks.push(id);
         localStorage.setItem('jiwoo_bookmarks', JSON.stringify(bookmarks));
-        
-        if(document.getElementById('display-album-name').innerText === "내 북마크") showBookmarks();
-        else renderCards(searchInput.value);
+        renderCards(searchInput.value);
     }
 
-    searchToggle.addEventListener('click', () => {
-        const isVisible = searchBar.style.display === 'block';
-        searchBar.style.display = isVisible ? 'none' : 'block';
-        if (!isVisible) { 
-            searchInput.focus(); 
-            searchInput.value = '';
-            document.getElementById('welcome-view').style.display = 'none'; 
-        } else goHome();
-    });
+    function renderMenu() {
+        const menuListContainer = document.getElementById('menu-list-container');
+        menuListContainer.innerHTML = menuStructure.map((parent, index) => `
+            <div class="menu-group">
+                <div class="menu-parent-row">
+                    <span class="menu-parent-text" onclick="selectAlbum('${parent.name}')">${parent.name}</span>
+                    ${parent.children.length > 0 ? `<div class="toggle-btn" onclick="toggleSubMenu(this, ${index})"><i class="fas fa-chevron-down"></i></div>` : ''}
+                </div>
+                ${parent.children.length > 0 ? `<ul class="menu-child-list" id="submenu-${index}" style="display:none;">${parent.children.map(child => `<li class="menu-child-item" onclick="selectFromMenu('${parent.name}', '${child}')">${child}</li>`).join('')}</ul>` : ''}
+            </div>
+        `).join('');
+    }
 
-    searchInput.addEventListener('input', (e) => {
-        const val = e.target.value;
-        if (val.trim() !== '') {
-            document.getElementById('result-area').style.display = 'block';
-            renderCards(val);
-        } else {
-            goHome();
-        }
-    });
+    function toggleSubMenu(btn, index) {
+        const submenu = document.getElementById(`submenu-${index}`);
+        submenu.style.display = (submenu.style.display === 'flex') ? 'none' : 'flex';
+        btn.classList.toggle('active');
+    }
 
-    menuToggle.addEventListener('click', () => {
-        if (tocMenu.style.display === 'block') {
-            tocMenu.style.display = 'none'; mainView.style.display = 'block';
-            menuToggle.querySelector('i').className = 'fas fa-bars';
-        } else {
-            tocMenu.style.display = 'block'; mainView.style.display = 'none';
-            menuToggle.querySelector('i').className = 'fas fa-times';
-        }
-    });
+    function selectFromMenu(p, c) { selectAlbum(p); currentTab = c; renderAlbumTabs(); renderCards(); }
+
+    function selectAlbum(name) {
+        document.getElementById('toc-menu').style.display = 'none';
+        document.getElementById('welcome-view').style.display = 'none';
+        document.getElementById('result-area').style.display = 'block';
+        currentAlbum = name; currentTab = '전체';
+        renderAlbumTabs(); renderCards();
+    }
+
+    document.getElementById('menu-toggle').onclick = () => {
+        const menu = document.getElementById('toc-menu');
+        menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+    };
 
     renderMenu();
 </script>
