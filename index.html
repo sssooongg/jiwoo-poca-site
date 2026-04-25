@@ -32,20 +32,26 @@
 
         .container { max-width: 500px; margin: 0 auto; min-height: 100vh; background-color: #fff; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.05); }
         
+        /* [수정] 헤더 완전 고정 및 z-index 최상위 유지 */
         .header {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 12px 20px; height: 57px; position: sticky; top: 0; z-index: 3000;
+            padding: 12px 20px; height: 57px; 
+            position: fixed; top: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 500px;
+            z-index: 3500;
             background-color: #fff; border-bottom: 1px solid var(--border);
         }
         .logo { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 20px; font-weight: 700; color: #1e272e; cursor: pointer; white-space: nowrap; }
         .icon-btn { background: none; border: none; cursor: pointer; color: #485460; font-size: 1.2rem; padding: 8px; position: relative; z-index: 3100; }
 
-        /* 새로운 창이 켜지는 느낌을 위해 완전 불투명 흰색 배경 및 전체 높이 설정 */
+        /* 헤더가 고정되었으므로 컨텐츠 영역 상단에 여백 추가 */
+        .main-content { padding: 77px 20px 20px; min-height: 80vh; }
+
         .toc-menu {
             position: fixed; top: 57px; left: 50%; transform: translateX(-50%);
             max-width: 500px; width: 100%; height: calc(100vh - 57px); z-index: 2500;
             overflow-y: auto; background-color: #fff; display: none;
-            padding-bottom: 100px; /* 기타 메뉴 잘림 방지용 하단 여백 */
+            padding-bottom: 100px;
         }
         .menu-group { border-bottom: 1px solid var(--border); padding: 5px 0; }
         .menu-parent-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; }
@@ -55,7 +61,6 @@
         .menu-child-list { list-style: none; padding: 5px 20px 15px; display: none; flex-wrap: wrap; gap: 8px; }
         .menu-child-item { font-size: 0.8rem; color: #636e72; cursor: pointer; background: #f1f2f6; padding: 6px 14px; border-radius: 20px; }
 
-        .main-content { padding: 20px; min-height: 80vh; }
         .welcome { text-align: center; margin-top: 80px; }
         .welcome p { color: #a4b0be; font-size: 0.95rem; }
         .bookmark-main-btn { 
@@ -179,9 +184,7 @@
 </div>
 
 <script>
-    // [데이터 영역] 사용자님의 pcData 리스트를 여기에 넣으세요
     const pcData = [
-
 { id: '1', name: 'The Chase 지우 Photobook Ver.', album: 'The Chase', category: '앨범 포카', version: 'Photobook Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/photobook%20vers..jpg', info: '더체이스, 핑크색 배경, 네일, 깐머리, 노란색 옷' },
        { id: '2', name: 'The Chase 지우 Minibook Ver.', album: 'The Chase', category: '앨범 포카', version: 'Minibook Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/minibookver.jpg', info: '더체이스, 브이, 깐머리' },
  { id: '3', name: 'The Chase 지우 Package Ver.', album: 'The Chase', category: '앨범 포카', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/package%20ver..jpg', info: '더체이스, 앞머리, 초록색 옷' },
@@ -501,7 +504,7 @@
 
 
 
-];
+]; // [데이터 영역]
 
     let bookmarks = JSON.parse(localStorage.getItem('jiwoo_bookmarks')) || [];
     let currentAlbum = '', currentTab = '', currentVer = '전체', currentFsType = '전체', currentViewingId = null;
@@ -536,7 +539,6 @@
             return mAlb && mTab && mVer && mFs;
         });
 
-        // [정렬 로직 유지] 
         filtered.sort((a, b) => {
             const getAlbumPriority = (pc) => {
                 const name = pc.name.toUpperCase();
@@ -572,7 +574,6 @@
             return cleanA.localeCompare(cleanB, 'ko', { numeric: true });
         });
 
-        // [검색 로직] 검색 시 레이아웃 처리
         if (keyword !== '') {
             document.getElementById('display-album-name').style.display = "none";
             document.getElementById('tab-wrapper').style.display = "none";
@@ -720,7 +721,6 @@
         renderCards();
     });
 
-    // [검색 돋보기 동작 수정] 누르면 검색창 즉시 활성화
     document.getElementById('search-toggle').onclick = () => {
         closeMenu(); 
         const bar = document.getElementById('search-bar');
