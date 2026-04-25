@@ -17,215 +17,126 @@
             --bg: #f8f9fa;
             --card-shadow: 0 4px 12px rgba(0,0,0,0.08);
             --border: #edf2f7;
-            --grid-cols: 2; /* 기본 2열 설정 */
+            --grid-cols: 2;
         }
 
-        /* [수정] 전체 리셋 및 모바일 확대 방지 */
-        * { 
-            margin: 0; padding: 0; box-sizing: border-box; 
-            -webkit-tap-highlight-color: transparent; 
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         html, body { 
-            font-family: 'Noto Sans KR', sans-serif; 
-            background-color: var(--bg); 
-            color: #2d3436; 
-            line-height: 1.6;
-            /* 모바일 확대 방지 핵심 */
-            touch-action: pan-x pan-y;
-            -webkit-text-size-adjust: none;
-            overflow-x: hidden;
+            font-family: 'Noto Sans KR', sans-serif; background-color: var(--bg); color: #2d3436; line-height: 1.6;
+            touch-action: pan-x pan-y; -webkit-text-size-adjust: none; overflow-x: hidden;
         }
-
-        /* [수정] 입력창 클릭 시 화면 커짐 방지 (폰트 16px) */
+        html { overflow-y: scroll; }
         input[type="text"] { font-size: 16px !important; }
 
         .container { max-width: 500px; margin: 0 auto; min-height: 100vh; background-color: #fff; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.05); }
         
-        .header { 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 12px 20px; background-color: #fff; border-bottom: 1px solid var(--border);
-            position: sticky; top: 0; z-index: 1000;
+        .header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 20px; height: 57px; position: sticky; top: 0; z-index: 1000;
+            background-color: #fff; border-bottom: 1px solid var(--border);
         }
-        .logo { font-size: 20px; font-weight: 700; color: #1e272e; cursor: pointer; user-select: none; letter-spacing: -0.5px; }
-        .icon-btn { background: none; border: none; cursor: pointer; color: #485460; font-size: 1.2rem; padding: 8px; transition: color 0.2s; }
-        
-        .toc-menu { 
-            display: none; background-color: #fff; padding: 15px 20px; 
-            position: absolute; top: 57px; left: 0; width: 100%; 
-            height: calc(100vh - 57px); z-index: 2000; overflow-y: auto;
+        .logo { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 20px; font-weight: 700; color: #1e272e; cursor: pointer; white-space: nowrap; }
+        .icon-btn { background: none; border: none; cursor: pointer; color: #485460; font-size: 1.2rem; padding: 8px; position: relative; z-index: 1200; }
+
+        .toc-menu {
+            position: fixed; top: 57px; left: 50%; transform: translateX(-50%);
+            max-width: 500px; width: 100%; height: calc(100vh - 57px); z-index: 2000;
+            overflow-y: auto; background-color: #fff; display: none;
         }
         .menu-group { border-bottom: 1px solid var(--border); padding: 5px 0; }
-        .menu-parent-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; }
+        .menu-parent-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; }
         .menu-parent-text { font-size: 1.05rem; font-weight: 700; color: #2d3436; cursor: pointer; flex: 1; }
         .toggle-btn { padding: 10px; cursor: pointer; color: #b2bec3; transition: 0.3s; }
         .toggle-btn.active { transform: rotate(180deg); color: var(--primary); }
-        .menu-child-list { list-style: none; padding: 5px 0 15px 5px; display: none; flex-wrap: wrap; gap: 8px; }
-        .menu-child-item { font-size: 0.8rem; color: #636e72; cursor: pointer; background: #f1f2f6; padding: 6px 14px; border-radius: 20px; transition: 0.2s; }
+        .menu-child-list { list-style: none; padding: 5px 20px 15px; display: none; flex-wrap: wrap; gap: 8px; }
+        .menu-child-item { font-size: 0.8rem; color: #636e72; cursor: pointer; background: #f1f2f6; padding: 6px 14px; border-radius: 20px; }
 
         .main-content { padding: 20px; min-height: 80vh; }
-        
-        .welcome { text-align: center; margin-top: 80px; animation: fadeIn 0.8s; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .welcome { text-align: center; margin-top: 80px; }
         .welcome p { color: #a4b0be; font-size: 0.95rem; }
         .bookmark-main-btn { 
-            margin-top: 25px; padding: 12px 30px; border: none; 
-            background: var(--secondary); color: #fff; border-radius: 50px; 
-            font-weight: 700; cursor: pointer; box-shadow: 0 4px 15px rgba(255, 71, 87, 0.3);
-            transition: 0.2s; font-size: 0.9rem;
+            margin-top: 25px; padding: 12px 30px; border: none; background: var(--secondary); 
+            color: #fff; border-radius: 50px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 15px rgba(255, 71, 87, 0.3);
         }
 
-        .search-bar-container { display: none; margin-bottom: 20px; animation: fadeIn 0.4s; }
+        .search-bar-container { display: none; margin-bottom: 20px; }
         .search-input-wrapper { position: relative; display: flex; align-items: center; }
         .search-input-wrapper i { position: absolute; left: 15px; color: #a4b0be; font-size: 0.9rem; }
-        .search-input-wrapper input { 
-            width: 100%; padding: 12px 12px 12px 40px; border: 1px solid var(--border); 
-            border-radius: 12px; outline: none; background: #f9f9f9; 
-        }
+        .search-input-wrapper input { width: 100%; padding: 12px 12px 12px 40px; border: 1px solid var(--border); border-radius: 12px; outline: none; background: #f9f9f9; }
 
-        #result-area { display: none; animation: fadeIn 0.4s; }
-        .album-title { font-size: 1.4rem; font-weight: 700; color: var(--primary); margin-bottom: 15px; letter-spacing: -0.5px; }
+        #result-area { display: none; }
+        .album-title { font-size: 1.4rem; font-weight: 700; color: var(--primary); margin-bottom: 15px; }
         .tab-container { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
-        .tab-btn { 
-            padding: 7px 14px; border: 1px solid var(--border); background: #fff; 
-            border-radius: 8px; cursor: pointer; font-size: 0.75rem; font-weight: 500; color: #7f8c8d;
-        }
-        .tab-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3); }
+        .tab-btn { padding: 7px 14px; border: 1px solid var(--border); background: #fff; border-radius: 8px; cursor: pointer; font-size: 0.75rem; font-weight: 500; color: #7f8c8d; }
+        .tab-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
         
         .sub-filter-group { background: #f9f9f9; padding: 12px; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--border); }
-        .filter-label { font-size: 0.75rem; color: #a4b0be; margin-bottom: 8px; font-weight: 700; }
         .filter-btns { display: flex; flex-wrap: wrap; gap: 6px; }
         .f-btn { flex: 1; min-width: 80px; padding: 7px; border-radius: 6px; border: 1px solid #ddd; background: #fff; font-size: 0.7rem; cursor: pointer; color: #636e72; }
         .f-btn.active { background: #2d3436; color: #fff; border-color: #2d3436; }
 
-        /* [수정] 슬라이더 및 카운트 레이아웃 (오른쪽 끝 배치) */
         .info-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        #tab-label { font-size: 0.85rem; font-weight: 700; color: #b2bec3; margin-bottom: 0; }
-        
-        #grid-slider-container { 
-            display: none; align-items: center; gap: 8px; 
-            margin-left: auto; /* 오른쪽 끝으로 밀기 */
-        }
-        .zoom-slider { 
-            -webkit-appearance: none; width: 80px; height: 4px; 
-            background: #dfe6e9; border-radius: 2px; outline: none;
-        }
-        .zoom-slider::-webkit-slider-thumb {
-            -webkit-appearance: none; width: 14px; height: 14px; 
-            background: var(--primary); border-radius: 50%; cursor: pointer;
-        }
+        #tab-label { font-size: 0.85rem; font-weight: 700; color: #b2bec3; }
+        #grid-slider-container { display: none; align-items: center; gap: 8px; margin-left: auto; }
+        .zoom-slider { -webkit-appearance: none; width: 80px; height: 4px; background: #dfe6e9; border-radius: 2px; outline: none; }
+        .zoom-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; background: var(--primary); border-radius: 50%; cursor: pointer; }
 
-        /* [수정] 동적 가로 배열 시스템 */
-        .card-grid { 
-            display: grid; 
-            grid-template-columns: repeat(var(--grid-cols), 1fr); 
-            gap: calc(20px / var(--grid-cols)); 
-            margin-top: 10px; 
-        }
-
-        .card-item { 
-            background: #fff; border-radius: 12px; border: 1px solid var(--border); 
-            padding: 8px; display: flex; flex-direction: column; position: relative; 
-            box-shadow: var(--card-shadow);
-        }
-        
-        .card-image-wrapper { 
-            width: 100%; aspect-ratio: 5.5 / 8.5; border-radius: 8px; overflow: hidden; 
-            background: #f1f2f6; position: relative;
-        }
+        .card-grid { display: grid; grid-template-columns: repeat(var(--grid-cols), 1fr); gap: calc(20px / var(--grid-cols)); margin-top: 10px; }
+        .card-item { background: #fff; border-radius: 12px; border: 1px solid var(--border); padding: 8px; display: flex; flex-direction: column; position: relative; box-shadow: var(--card-shadow); transition: transform 0.2s; }
+        .card-image-wrapper { width: 100%; aspect-ratio: 5.5 / 8.5; border-radius: 8px; overflow: hidden; background: #f1f2f6; }
         .card-image-wrapper img { width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
-        
         .card-name { font-size: 0.85rem; font-weight: 700; color: #2d3436; margin: 10px 0 4px; text-align: center; }
-        
-        /* 3열 이상(축소 시) 스타일 자동 조정 */
+
         .grid-3-plus .card-name { font-size: 0.7rem; margin: 6px 0 2px; line-height: 1.2; }
         .grid-3-plus .card-item { padding: 5px; border-radius: 8px; }
-        .grid-3-plus .card-bookmark-btn { width: 24px; height: 24px; font-size: 0.8rem; top: 8px; right: 8px; }
 
         .card-bookmark-btn { 
-            position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.8); 
-            border: none; cursor: pointer; font-size: 1.1rem; color: #dfe6e9; 
-            z-index: 5; width: 32px; height: 32px; border-radius: 50%;
+            position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.8); border: none; cursor: pointer; 
+            font-size: 1.1rem; color: #dfe6e9; z-index: 5; width: 32px; height: 32px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px);
         }
         .card-bookmark-btn.active { color: var(--secondary); background: #fff; }
 
+        /* 모달 스타일 통합 */
         .modal {
-            display: none; position: fixed; z-index: 3000; top: 0; left: 0;
-            width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.9);
-            justify-content: center; align-items: center; cursor: zoom-out;
+            display: none; position: fixed; z-index: 3000; top: 0; left: 0; width: 100%; height: 100%; 
+            background-color: rgba(0, 0, 0, 0.9); justify-content: center; align-items: center;
         }
-        .modal-content {
-            max-width: 90%; max-height: 80%; border-radius: 15px;
-            animation: zoomIn 0.3s;
+        .modal-content { max-width: 90%; max-height: 75%; border-radius: 15px; animation: zoomIn 0.3s; z-index: 3100; }
+        
+        .modal-controls {
+            position: absolute; top: 20px; width: 100%; padding: 0 20px;
+            display: flex; justify-content: space-between; z-index: 3200;
         }
+
+        .modal-icon-btn {
+            background: rgba(0, 0, 0, 0.5); border: 2px solid rgba(255, 255, 255, 0.8);
+            color: white; font-size: 1.5rem; width: 45px; height: 45px; border-radius: 50%;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            backdrop-filter: blur(5px); transition: 0.2s;
+        }
+        .modal-icon-btn.active { color: var(--secondary); border-color: var(--secondary); }
+
+        .modal-caption {
+            position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+            color: white; background: rgba(0, 0, 0, 0.6); padding: 10px 25px;
+            border-radius: 30px; font-size: 0.9rem; font-weight: 500;
+            backdrop-filter: blur(5px); z-index: 3200; white-space: nowrap;
+        }
+
+        /* 이동 강조 애니메이션 */
+        @keyframes highlight-glow {
+            0% { transform: scale(1); box-shadow: 0 0 0px var(--primary); }
+            50% { transform: scale(1.08); box-shadow: 0 0 25px var(--primary); border-color: var(--primary); }
+            100% { transform: scale(1); box-shadow: 0 0 0px var(--primary); }
+        }
+        .highlight-card {
+            animation: highlight-glow 0.8s ease-in-out 2;
+            z-index: 10; position: relative; border: 2px solid var(--primary) !important;
+        }
+
         @keyframes zoomIn { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-.welcome-char {
-    display: block;
-    margin: 0 auto 0px; /* 가운데 정렬 및 아래 간격 */
-    height: 155px;       /* 100~150 사이로 원하는 크기를 조절해 보세요 */
-    width: auto;
-}
-/* 헤더 전체 구조 설정 */
-.header {
-    display: flex;
-    justify-content: space-between; /* 양끝으로 버튼 배치 */
-    align-items: center;
-    padding: 12px 20px;
-    height: 57px; /* 높이를 고정해서 들썩임 방지 */
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    background-color: #fff;
-}
-
-/* 로고를 부모(헤더) 기준 정중앙에 절대 좌표로 박아버림 */
-.logo {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%); /* 정확히 중앙으로 이동 */
-    margin: 0 !important;
-    white-space: nowrap;
-    pointer-events: auto; /* 클릭은 가능하게 유지 */
-    z-index: 1100;
-}
-
-/* 버튼들은 로고와 상관없이 제 자리에 있게 함 */
-.icon-btn {
-    position: relative;
-    z-index: 1200; /* 버튼이 로고보다 위에 오게 해서 클릭 방해 방지 */
-    min-width: 40px; /* 버튼 자리를 미리 확보 */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-/* 1. 스크롤바 공간을 강제로 고정해서 화면 밀림 방지 */
-html {
-    overflow-y: scroll; 
-}
-
-/* 2. 메뉴 열릴 때 바디 고정 */
-body {
-    -webkit-text-size-adjust: none;
-    touch-action: pan-x pan-y;
-    width: 100%;
-}
-
-/* 3. 메뉴 레이아웃 위치 미세 조정 */
-.toc-menu {
-    position: fixed; /* absolute 대신 fixed로 변경하여 화면에 고정 */
-    top: 57px;
-    left: 50%; /* 가운데 정렬 유지 */
-    transform: translateX(-50%);
-    max-width: 500px; /* 컨테이너 너비와 동일하게 */
-    width: 100%;
-    height: calc(100vh - 57px);
-    z-index: 2000;
-    overflow-y: auto;
-    background-color: #fff;
-}
-
     </style>
 </head>
 <body>
@@ -250,7 +161,7 @@ body {
         </div>
 
         <div id="welcome-view" class="welcome">
-<p>메뉴를 선택해 포토카드를 확인하세요</p>
+            <p>메뉴를 선택해 포토카드를 확인하세요</p>
             <button class="bookmark-main-btn" onclick="showBookmarks()">
                 <i class="fas fa-heart"></i> 내 북마크 보기
             </button>
@@ -261,34 +172,37 @@ body {
             <div id="tab-wrapper" class="tab-container"></div>
             
             <div id="version-filter" class="sub-filter-group" style="display:none;">
-                <p class="filter-label">VERSION</p>
                 <div id="version-btn-wrapper" class="filter-btns"></div>
             </div>
 
             <div id="fansign-filter" class="sub-filter-group" style="display:none;">
-                <p class="filter-label">FANSIGN TYPE</p>
                 <div id="fansign-btn-wrapper" class="filter-btns"></div>
             </div>
 
-           <div class="info-row">
-    <div id="tab-label">[전체] 목록</div>
-    <div id="grid-slider-container">
-        <i class="fas fa-minus" style="font-size: 0.7rem; color: #b2bec3;"></i>
-        <input type="range" id="grid-range" class="zoom-slider" min="2" max="4" value="2" step="1">
-        <i class="fas fa-plus" style="font-size: 0.7rem; color: #b2bec3;"></i>
-    </div>
-</div>
-<div class="card-grid" id="pc-list"></div>
+            <div class="info-row">
+                <div id="tab-label">[전체] 목록</div>
+                <div id="grid-slider-container">
+                    <i class="fas fa-minus" style="font-size: 0.7rem; color: #b2bec3;"></i>
+                    <input type="range" id="grid-range" class="zoom-slider" min="2" max="4" value="2" step="1">
+                    <i class="fas fa-plus" style="font-size: 0.7rem; color: #b2bec3;"></i>
+                </div>
+            </div>
+            <div class="card-grid" id="pc-list"></div>
         </div>
     </main>
 </div>
 
-<div id="image-modal" class="modal" onclick="closeModal()">
+<div id="image-modal" class="modal" onclick="closeModal(event)">
+    <div class="modal-controls">
+        <button id="modal-bookmark-btn" class="modal-icon-btn"><i class="far fa-heart"></i></button>
+        <button class="modal-icon-btn" onclick="closeModal(event)"><i class="fas fa-times"></i></button>
+    </div>
     <img id="modal-img" class="modal-content">
+    <div id="modal-pc-name" class="modal-caption">포토카드 이름</div>
 </div>
-</style>
 
 <script>
+    // 데이터 (생략 없이 유지)
     const pcData = [
        { id: '1', name: 'The Chase 지우 Photobook Ver.', album: 'The Chase', category: '앨범 포카', version: 'Photobook Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/photobook%20vers..jpg', info: '더체이스, 핑크색 배경, 네일, 깐머리, 노란색 옷' },
        { id: '2', name: 'The Chase 지우 Minibook Ver.', album: 'The Chase', category: '앨범 포카', version: 'Minibook Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/minibookver.jpg', info: '더체이스, 브이, 깐머리' },
@@ -604,21 +518,12 @@ body {
 { id: '312', name: '지우 테레카 2025 케이팝 루키 베이스', album: '기타', category: 'TELECA 2025 KPOP ROOKIE', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%ED%85%8C%EB%A0%88%EC%B9%B4%20%EB%8B%A8%EC%B2%B4%201.jpg', info: 'teleca, 단체, 교복' },
 { id: '313', name: '지우 테레카 2025 케이팝 루키 베이스', album: '기타', category: 'TELECA 2025 KPOP ROOKIE', fsType: '대면', imgUrl: 'https://pub-922ba0bad5ad4e69b6be212b08ae99ad.r2.dev/%ED%85%8C%EB%A0%88%EC%B9%B4%20%EB%8B%A8%EC%B2%B4%202.jpg', info: 'teleca, 단체, 나그랑티' },
 
+    ];
 
-
-
-
-
-
-{ id: '199', name: 'The Chase 지우 케이엠스테이션 2.0', album: 'The Chase', category: '팬싸 특전', fsType: '대면', imgUrl: '', info: '더체이스, 안경, 브이' },
-
-
- ]; 
-let bookmarks = JSON.parse(localStorage.getItem('jiwoo_bookmarks')) || [];
+    let bookmarks = JSON.parse(localStorage.getItem('jiwoo_bookmarks')) || [];
     let currentAlbum = '';
     let currentTab = '';
-    let currentVer = '전체';
-    let currentFsType = '전체';
+    let currentViewingId = null;
 
     const menuToggle = document.getElementById('menu-toggle');
     const tocMenu = document.getElementById('toc-menu');
@@ -638,12 +543,12 @@ let bookmarks = JSON.parse(localStorage.getItem('jiwoo_bookmarks')) || [];
         { name: 'FOCUS', children: ['앨범 포카', '예판 특전', '럭키드로우', '팬싸 특전'] },
         { name: 'RUDE!', children: ['럭키드로우', '기타'] },
         { name: '유닛 포카', children: ['The Chase', 'STYLE', 'FOCUS', 'RUDE!', '기타'] },
-        { name: 'MD 포카', children: ['The Chase', 'STYLE', 'FOCUS', '1st ANNIVERSARY', 'Four Hearts Club', '티니핑', '시즌그리팅', 'Hearts2House', '응원봉', 'BIRTHDAY'] },
-        { name: '기타', children: ['메가 커피', 'SUPER STAR SM', 'SMT 25', 'BARENBLISS', '2aN', 'scarlett', 'TELECA 2025 KPOP ROOKIE', 'SM 30th', '국민은행', 'LILY BROWN'] }
+        { name: 'MD 포카', children: ['The Chase', 'STYLE', 'FOCUS', '시즌그리팅', 'Hearts2House'] },
+        { name: '기타', children: ['메가 커피', 'SUPER STAR SM', 'SMT 25', '국민은행'] }
     ];
 
-    // 슬라이더 작동 로직
-gridRange.max = 4; //
+    // 슬라이더 조절 (최대 4배열)
+    gridRange.max = 4;
     gridRange.addEventListener('input', (e) => {
         const val = e.target.value;
         document.documentElement.style.setProperty('--grid-cols', val);
@@ -656,10 +561,9 @@ gridRange.max = 4; //
         mainView.style.display = 'block';
         searchBar.style.display = 'none';
         sliderContainer.style.display = 'none';
-        document.getElementById('tab-wrapper').style.display = 'flex';
-        menuToggle.querySelector('i').className = 'fas fa-bars';
         document.getElementById('welcome-view').style.display = 'block';
         document.getElementById('result-area').style.display = 'none';
+        menuToggle.querySelector('i').className = 'fas fa-bars';
     }
 
     function renderMenu() {
@@ -687,8 +591,6 @@ gridRange.max = 4; //
         tocMenu.style.display = 'none';
         mainView.style.display = 'block';
         searchBar.style.display = 'none';
-        document.getElementById('tab-wrapper').style.display = 'flex';
-        menuToggle.querySelector('i').className = 'fas fa-bars';
         document.getElementById('welcome-view').style.display = 'none';
         document.getElementById('result-area').style.display = 'block';
         document.getElementById('display-album-name').innerText = name;
@@ -699,60 +601,19 @@ gridRange.max = 4; //
         if (findMenu) tabs = tabs.concat(findMenu.children);
         document.getElementById('tab-wrapper').innerHTML = tabs.map(t => `<button class="tab-btn" onclick="changeTab(this, '${t}')">${t}</button>`).join('');
         changeTab(null, '전체');
+        menuToggle.querySelector('i').className = 'fas fa-bars';
     }
 
     function changeTab(el, cat) {
-        const buttons = document.querySelectorAll('.tab-btn');
-        buttons.forEach(b => {
+        document.querySelectorAll('.tab-btn').forEach(b => {
             if(b.innerText.trim() === cat.trim()) b.classList.add('active');
             else b.classList.remove('active');
         });
-
         currentTab = cat;
-        currentVer = '전체';
-        currentFsType = '전체';
-
-        const vFilter = document.getElementById('version-filter');
-        const fFilter = document.getElementById('fansign-filter');
-        vFilter.style.display = 'none';
-        fFilter.style.display = 'none';
-
-        if (cat.includes('앨범')) {
-            if (currentAlbum === 'The Chase' || currentAlbum === 'FOCUS') {
-                vFilter.style.display = 'block';
-                let vers = ['전체'];
-                if (currentAlbum === 'The Chase') vers.push('Photobook Ver.', 'Package Ver.', 'Minibook Ver.');
-                else if (currentAlbum === 'FOCUS') vers.push('Rule Book Ver.', 'PhotoBook Ver.', 'Heart Locket Ver.', 'SMini Ver.');
-                document.getElementById('version-btn-wrapper').innerHTML = vers.map(v => `<button class="f-btn ${v==='전체'?'active':''}" onclick="setVersion(this, '${v}')">${v}</button>`).join('');
-            }
-        } else if (cat.includes('팬싸')) {
-            if (currentAlbum === 'The Chase' || currentAlbum === 'FOCUS' || currentAlbum === 'STYLE') {
-                fFilter.style.display = 'block';
-                document.getElementById('fansign-btn-wrapper').innerHTML = ['전체', '대면', '영통'].map(t => `<button class="f-btn ${t==='전체'?'active':''}" onclick="setFsType(this, '${t}')">${t}</button>`).join('');
-            }
-        }
         renderCards();
     }
 
-    function setVersion(el, ver) {
-        el.parentElement.querySelectorAll('.f-btn').forEach(b => b.classList.remove('active'));
-        el.classList.add('active');
-        currentVer = ver;
-        renderCards();
-    }
-
-    function setFsType(el, type) {
-        el.parentElement.querySelectorAll('.f-btn').forEach(b => b.classList.remove('active'));
-        el.classList.add('active');
-        currentFsType = type;
-        renderCards();
-    }
-
- function renderCards(keyword = '') {
-        const sliderContainer = document.getElementById('grid-slider-container');
-        const gridRange = document.getElementById('grid-range');
-
-        // 1. 데이터 필터링
+    function renderCards(keyword = '') {
         let filtered = pcData.filter(pc => {
             if (keyword !== '') {
                 const target = keyword.toLowerCase();
@@ -760,113 +621,29 @@ gridRange.max = 4; //
             }
             const mAlb = currentAlbum === '전체' || pc.album === currentAlbum;
             const mTab = currentTab === '전체' || pc.category === currentTab;
-            const mVer = currentVer === '전체' || pc.version === currentVer;
-            const mFs = currentFsType === '전체' || pc.fsType === currentFsType;
-            return mAlb && mTab && mVer && mFs;
+            return mAlb && mTab;
         });
 
-   filtered.sort((a, b) => {
-    // 1. [대원칙] 앨범/메뉴 연대기 순서
-    const albumKeywords = ['THE CHASE', 'STYLE', 'FOCUS', 'RUDE!'];
-    const getAlbumPriority = (pc) => {
-        const fullText = (pc.album + pc.name).toUpperCase();
-        for (let i = 0; i < albumKeywords.length; i++) {
-            if (fullText.includes(albumKeywords[i])) return i;
+        if (currentAlbum === '전체' || currentTab === '전체' || keyword !== '') {
+            sliderContainer.style.display = 'flex';
+        } else {
+            sliderContainer.style.display = 'none';
+            document.documentElement.style.setProperty('--grid-cols', 2);
+            gridRange.value = 2;
         }
-        if (pc.album === '유닛 포카') return 4;
-        if (pc.album === 'MD 포카') return 5;
-        return 6;
-    };
 
-    const priA = getAlbumPriority(a);
-    const priB = getAlbumPriority(b);
-    if (priA !== priB) return priA - priB;
-
-    // 2. [소원칙] 카테고리 순서 (앨범->예판->럭드->팬싸)
-    const categoryOrder = { '앨범 포카': 1, '예판 특전': 2, '럭키드로우': 3, '팬싸 특전': 4 };
-    const catA = categoryOrder[a.category] || 5;
-    const catB = categoryOrder[b.category] || 5;
-    if (catA !== catB) return catA - catB;
-
-    // 3. [폴라로이드 정렬 핵심 수정]
-    // 이름에서 '폴라'와 그 앞뒤에 있을 수 있는 공백을 완전히 제거한 '비교용 이름' 생성
-    const cleanA = a.name.replace(/폴라/g, '').replace(/\s+/g, ' ').trim();
-    const cleanB = b.name.replace(/폴라/g, '').replace(/\s+/g, ' ').trim();
-
-    // 3-1. '폴라'를 떼고 봐도 이름이 다르다면? (이때 한글-숫자-영어 정렬 적용)
-    if (cleanA !== cleanB) {
-        const getCharPriority = (str) => {
-            const first = str.trim().charAt(0);
-            if (/[가-힣]/.test(first)) return 1;
-            if (/[0-9]/.test(first)) return 2;
-            if (/[a-zA-Z]/.test(first)) return 3;
-            return 4;
-        };
-
-        const cpA = getCharPriority(cleanA);
-        const cpB = getCharPriority(cleanB);
-
-        if (cpA !== cpB) return cpA - cpB;
-        // 숫자가 포함된 이름(1.0, 2.0)을 순서대로 정렬
-        return cleanA.localeCompare(cleanB, 'ko', { numeric: true });
-    }
-
-    // 3-2. '폴라'를 떼고 보니 이름이 같다면? (예: "스타리버 1.0" vs "스타리버 1.0 폴라")
-    // 폴라가 없는 것이 무조건 앞(-1), 있는 것이 무조건 뒤(1)
-    const hasPolarA = a.name.includes('폴라');
-    const hasPolarB = b.name.includes('폴라');
-
-    if (hasPolarA !== hasPolarB) {
-        return hasPolarA ? 1 : -1;
-    }
-
-    // 4. 마지막 보험 (완전 동일한 경우)
-    return a.name.localeCompare(b.name, 'ko');
-});
-
-
-// 3. [핵심 수정] '전체'일 때만 슬라이더 노출, 나머지는 2열 리셋
-    // 전체 탭이거나 검색 중일 때 슬라이더 허용
-    if (currentAlbum === '전체' || currentTab === '전체' || keyword !== '') {
-        sliderContainer.style.display = 'flex';
-        document.documentElement.style.setProperty('--grid-cols', gridRange.value);
-        if (gridRange.value >= 3) pcList.classList.add('grid-3-plus');
-    } else {
-        // 특정 앨범이나 메뉴로 들어가면 무조건 2열로 초기화
-        sliderContainer.style.display = 'none';
-        gridRange.value = 2; // 슬라이더 손잡이 위치도 2로 복구
-        document.documentElement.style.setProperty('--grid-cols', 2);
-        pcList.classList.remove('grid-3-plus');
-    }
-  
-
-        // 4. 화면 렌더링
         document.getElementById('tab-label').innerText = keyword ? `"${keyword}" 결과: ${filtered.length}건` : `전체 ${filtered.length}개의 포토카드`;
-        pcList.innerHTML = filtered.length > 0 ? 
-            filtered.map(pc => createCardHTML(pc)).join('') : 
-            `<div style="grid-column: span var(--grid-cols, 2); padding: 100px 0; color:#bdc3c7; text-align:center; font-size:0.9rem;">데이터가 없습니다.</div>`;
-    }
-   
-
-    function showBookmarks() {
-        document.getElementById('welcome-view').style.display = 'none';
-        document.getElementById('result-area').style.display = 'block';
-        document.getElementById('display-album-name').innerText = "내 북마크";
-        document.getElementById('tab-wrapper').innerHTML = ""; 
-        document.getElementById('version-filter').style.display = 'none';
-        document.getElementById('fansign-filter').style.display = 'none';
-        sliderContainer.style.display = 'none';
-        searchBar.style.display = 'none';
-        const bookmarkData = pcData.filter(pc => bookmarks.includes(pc.id)).sort((a,b) => a.name.localeCompare(b.name, 'ko', {numeric:true}));
-        document.getElementById('tab-label').innerText = `${bookmarkData.length}개의 북마크한 포토카드`;
-        pcList.innerHTML = bookmarkData.length > 0 ? bookmarkData.map(pc => createCardHTML(pc)).join('') : `<div style="grid-column: span var(--grid-cols); padding: 100px 0; color:#bdc3c7; text-align:center; font-size:0.9rem;">북마크가 없습니다.</div>`;
+        pcList.innerHTML = filtered.length > 0 ? filtered.map(pc => createCardHTML(pc)).join('') : `<div style="grid-column: span var(--grid-cols); padding: 100px 0; color:#bdc3c7; text-align:center;">데이터가 없습니다.</div>`;
     }
 
     function createCardHTML(pc) {
         const isBookmarked = bookmarks.includes(pc.id);
-        const imgTag = pc.imgUrl ? `<img src="${pc.imgUrl}" alt="${pc.name}" onclick="openModal('${pc.imgUrl}')">` : `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#dfe6e9;"><i class="fas fa-image fa-2x"></i></div>`;
+        const imgTag = pc.imgUrl ? 
+            `<img src="${pc.imgUrl}" alt="${pc.name}" onclick="openModal('${pc.imgUrl}', '${pc.id}')">` : 
+            `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#dfe6e9;"><i class="fas fa-image fa-2x"></i></div>`;
+        
         return `
-            <div class="card-item">
+            <div class="card-item" id="card-${pc.id}">
                 <button class="card-bookmark-btn ${isBookmarked ? 'active' : ''}" onclick="toggleBookmark('${pc.id}')"><i class="${isBookmarked ? 'fas' : 'far'} fa-heart"></i></button>
                 <div class="card-image-wrapper">${imgTag}</div>
                 <div class="card-name">${pc.name}</div>
@@ -874,54 +651,101 @@ gridRange.max = 4; //
         `;
     }
 
+    function openModal(url, id) {
+        const modal = document.getElementById('image-modal');
+        const modalImg = document.getElementById('modal-img');
+        const modalName = document.getElementById('modal-pc-name');
+        const modalBookmark = document.getElementById('modal-bookmark-btn');
+        
+        const pc = pcData.find(item => item.id === id);
+        if (!pc) return;
+
+        currentViewingId = id; 
+        modal.style.display = "flex";
+        modalImg.src = url;
+        modalName.innerText = pc.name;
+        document.body.style.overflow = "hidden";
+
+        updateModalBookmarkUI();
+
+        // 모달 안 북마크 기능
+        modalBookmark.onclick = (e) => {
+            e.stopPropagation();
+            toggleBookmark(id);
+            updateModalBookmarkUI();
+        };
+
+        modalImg.onclick = (e) => e.stopPropagation(); 
+        modalImg.ondblclick = () => goToCard(currentViewingId);
+    }
+
+    function updateModalBookmarkUI() {
+        const modalBookmark = document.getElementById('modal-bookmark-btn');
+        const isBookmarked = bookmarks.includes(currentViewingId);
+        modalBookmark.innerHTML = isBookmarked ? `<i class="fas fa-heart"></i>` : `<i class="far fa-heart"></i>`;
+        modalBookmark.classList.toggle('active', isBookmarked);
+    }
+
+    function closeModal(e) {
+        if (e && e.stopPropagation) e.stopPropagation();
+        document.getElementById('image-modal').style.display = "none";
+        document.body.style.overflow = "auto";
+    }
+
+    function goToCard(id) {
+        if (!id) return;
+        document.getElementById('image-modal').style.display = "none";
+        document.body.style.overflow = "auto";
+        
+        setTimeout(() => {
+            const targetCard = document.getElementById(`card-${id}`);
+            if (targetCard) {
+                const offset = 100;
+                const elementPosition = targetCard.getBoundingClientRect().top + window.pageYOffset;
+                window.scrollTo({ top: elementPosition - offset, behavior: 'smooth' });
+                targetCard.classList.add('highlight-card');
+                setTimeout(() => targetCard.classList.remove('highlight-card'), 1600);
+            }
+        }, 150);
+    }
+
+    function showBookmarks() {
+        document.getElementById('welcome-view').style.display = 'none';
+        document.getElementById('result-area').style.display = 'block';
+        document.getElementById('display-album-name').innerText = "내 북마크";
+        const bookmarkData = pcData.filter(pc => bookmarks.includes(pc.id));
+        pcList.innerHTML = bookmarkData.map(pc => createCardHTML(pc)).join('');
+        document.getElementById('tab-label').innerText = `${bookmarkData.length}개의 북마크`;
+    }
+
     function toggleBookmark(id) {
         const index = bookmarks.indexOf(id);
-        if (index > -1) { bookmarks.splice(index, 1); } 
-        else { bookmarks.push(id); }
+        if (index > -1) bookmarks.splice(index, 1);
+        else bookmarks.push(id);
         localStorage.setItem('jiwoo_bookmarks', JSON.stringify(bookmarks));
-        if (document.getElementById('display-album-name').innerText === "내 북마크") showBookmarks();
-        else renderCards(searchInput.value);
+        
+        // 리스트 화면의 아이콘 즉시 업데이트를 위해 다시 그림
+        if(document.getElementById('display-album-name').innerText === "내 북마크") {
+            showBookmarks();
+        } else {
+            renderCards(searchInput.value);
+        }
     }
 
     searchToggle.addEventListener('click', () => {
         const isVisible = searchBar.style.display === 'block';
         searchBar.style.display = isVisible ? 'none' : 'block';
-        if (!isVisible) {
-            searchInput.focus();
-            searchInput.value = '';
-            document.getElementById('welcome-view').style.display = 'none';
-            document.getElementById('result-area').style.display = 'none';
-        } else {
-            goHome();
-        }
+        if (!isVisible) { searchInput.focus(); document.getElementById('welcome-view').style.display = 'none'; }
+        else goHome();
     });
 
     searchInput.addEventListener('input', (e) => {
         const val = e.target.value;
-        const tabWrapper = document.getElementById('tab-wrapper');
         if (val.trim() !== '') {
             document.getElementById('result-area').style.display = 'block';
-            document.getElementById('display-album-name').innerText = "검색 결과";
-            tabWrapper.style.display = 'none';
             renderCards(val);
-        } else {
-            document.getElementById('result-area').style.display = 'none';
-            tabWrapper.style.display = 'flex';
         }
     });
-
-    function openModal(url) {
-        const modal = document.getElementById('image-modal');
-        const modalImg = document.getElementById('modal-img');
-        modal.style.display = "flex";
-        modalImg.src = url;
-        document.body.style.overflow = "hidden";
-    }
-
-    function closeModal() {
-        document.getElementById('image-modal').style.display = "none";
-        document.body.style.overflow = "auto";
-    }
 
     menuToggle.addEventListener('click', () => {
         if (tocMenu.style.display === 'block') {
@@ -935,3 +759,5 @@ gridRange.max = 4; //
 
     renderMenu();
 </script>
+</body>
+</html>
