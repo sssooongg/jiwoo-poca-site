@@ -115,7 +115,7 @@
             background: var(--primary); border-radius: 50%; cursor: pointer;
         }
 
-    /* [최종] 슬라이더 연동 자동 비율 시스템 */
+/* [최종] 슬라이더 연동 자동 비율 시스템 */
 
 .card-grid {
     display: grid !important;
@@ -178,11 +178,42 @@
     overflow: hidden;
     background: #f1f2f6;
 }
-        
 
+/* 1. 이미지: 잘리지 않고 전체가 다 보이도록 수정 */
+.card-image-wrapper img {
+    width: 100% !important;
+    height: 100% !important;
+    /* cover 대신 contain을 쓰면 이미지가 잘리지 않고 전체가 상자 안에 들어옵니다 */
+    object-fit: contain !important; 
+    /* 배경색을 넣어 이미지가 작을 때 여백이 자연스럽게 보이게 함 */
+    background-color: #f8f9fa !important; 
+}
 
+/* 2. 자동 비율 시스템 (슬라이더에 따라 스르륵 변함) */
+.card-name {
+    /* 슬라이더 숫자가 커질수록 폰트가 더 역동적으로 작아짐 */
+    font-size: calc(1.2rem - (var(--grid-cols) * 0.14rem)) !important;
+    margin-top: calc(10px - (var(--grid-cols) * 1px)) !important;
+    line-height: 1.2;
+    text-align: center;
+    word-break: break-all;
+    
+    /* 이름이 두 줄이어도 줄이 안 꼬이게 높이 고정 */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 2.4em !important; 
+}
 
-
+/* 3. 북마크 버튼도 비율에 맞춰 작아짐 */
+.card-bookmark-btn {
+    width: calc(48px - (var(--grid-cols) * 6.5px)) !important;
+    height: calc(48px - (var(--grid-cols) * 6.5px)) !important;
+    font-size: calc(1.6rem - (var(--grid-cols) * 0.2rem)) !important;
+    top: calc(12px - (var(--grid-cols) * 1.5px)) !important;
+    right: calc(12px - (var(--grid-cols) * 1.5px)) !important;
+}
 
         
         .card-name { font-size: 0.85rem; font-weight: 700; color: #2d3436; margin: 10px 0 4px; text-align: center; }
@@ -888,21 +919,7 @@ gridRange.max = 5; //
         document.documentElement.style.setProperty('--grid-cols', 2);
         pcList.classList.remove('grid-3-plus');
     }
-  const val = gridRange.value;
-    pcList.classList.remove('grid-3-plus', 'grid-5-plus');
-    
-    // 전체, MD 포카, 유닛 포카 등에서도 슬라이더가 보이도록 설정
-    const isSliderMenu = ['전체', 'MD 포카', '유닛 포카'].includes(currentAlbum) || currentTab === '전체' || keyword !== '';
-
-    if (isSliderMenu) {
-        sliderContainer.style.display = 'flex';
-        document.documentElement.style.setProperty('--grid-cols', val);
-        if (val >= 5) pcList.classList.add('grid-5-plus');
-        else if (val >= 3) pcList.classList.add('grid-3-plus');
-    } else {
-        sliderContainer.style.display = 'none';
-        document.documentElement.style.setProperty('--grid-cols', 2);
-    }
+  
 
         // 4. 화면 렌더링
         document.getElementById('tab-label').innerText = keyword ? `"${keyword}" 결과: ${filtered.length}건` : `전체 ${filtered.length}개의 포토카드`;
