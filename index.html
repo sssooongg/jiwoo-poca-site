@@ -237,7 +237,48 @@
     gap: calc(16px - (var(--grid-cols) * 2px)) !important;
     align-items: start !important;
 }
+/* 1. 카드의 부모 요소 설정 (버튼 배치를 위해 필수) */
+.card-item {
+    position: relative !important; /* 버튼이 이 박스 안에서 위치를 잡게 함 */
+    overflow: visible !important; /* 내부 요소가 잘리지 않게 */
+}
 
+/* 2. 북마크 버튼: 절대 좌표로 맨 위로 올리기 */
+.card-bookmark-btn {
+    position: absolute !important;
+    /* 슬라이더 숫자에 따라 크기 자동 조절 (calc 활용) */
+    width: calc(44px - (var(--grid-cols) * 5px)) !important;
+    height: calc(44px - (var(--grid-cols) * 5px)) !important;
+    font-size: calc(1.4rem - (var(--grid-cols) * 0.15rem)) !important;
+    
+    /* 위치: 이미지의 오른쪽 상단 */
+    top: 10px !important;
+    right: 10px !important;
+    
+    /* 디자인: 하얀 동그라미 배경 */
+    background: rgba(255, 255, 255, 0.85) !important;
+    border: none !important;
+    border-radius: 50% !important;
+    
+    /* 배치 및 레이어: 무조건 맨 위로 */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 999 !important; /* 이미지(보통 1)보다 훨씬 높게 설정 */
+    
+    cursor: pointer !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    pointer-events: auto !important; /* 클릭 차단 해제 */
+}
+
+/* 3. 하트 아이콘 색상 설정 */
+.card-bookmark-btn .fa-heart {
+    color: #dfe6e9; /* 기본 빈 하트 색상 (연회색) */
+}
+
+.card-bookmark-btn.active .fa-heart {
+    color: #ff4757 !important; /* 활성화 시 빨간색 */
+}
         
         .card-name { font-size: 0.85rem; font-weight: 700; color: #2d3436; margin: 10px 0 4px; text-align: center; }
         
@@ -966,17 +1007,20 @@ gridRange.max = 5; //
         pcList.innerHTML = bookmarkData.length > 0 ? bookmarkData.map(pc => createCardHTML(pc)).join('') : `<div style="grid-column: span var(--grid-cols); padding: 100px 0; color:#bdc3c7; text-align:center; font-size:0.9rem;">북마크가 없습니다.</div>`;
     }
 
-    function createCardHTML(pc) {
-        const isBookmarked = bookmarks.includes(pc.id);
-        const imgTag = pc.imgUrl ? `<img src="${pc.imgUrl}" alt="${pc.name}" onclick="openModal('${pc.imgUrl}')">` : `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#dfe6e9;"><i class="fas fa-image fa-2x"></i></div>`;
-        return `
-            <div class="card-item">
-                <button class="card-bookmark-btn ${isBookmarked ? 'active' : ''}" onclick="toggleBookmark('${pc.id}')"><i class="${isBookmarked ? 'fas' : 'far'} fa-heart"></i></button>
-                <div class="card-image-wrapper">${imgTag}</div>
-                <div class="card-name">${pc.name}</div>
+function createCardHTML(pc) {
+    const isBookmarked = bookmarks.includes(pc.id);
+    return `
+        <div class="card-item" id="pc-card-${pc.id}">
+            <button class="card-bookmark-btn ${isBookmarked ? 'active' : ''}" onclick="toggleBookmark('${pc.id}')">
+                <i class="${isBookmarked ? 'fas' : 'far'} fa-heart"></i>
+            </button>
+            <div class="card-image-wrapper">
+                <img src="${pc.imgUrl}" alt="${pc.name}" onclick="openModal('${pc.id}')">
             </div>
-        `;
-    }
+            <div class="card-name">${pc.name}</div>
+        </div>
+    `;
+}
 
     function toggleBookmark(id) {
         const index = bookmarks.indexOf(id);
