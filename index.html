@@ -26,23 +26,26 @@
             font-family: 'Noto Sans KR', sans-serif; background-color: var(--bg); color: #2d3436; line-height: 1.6;
             touch-action: pan-x pan-y; -webkit-text-size-adjust: none; overflow-x: hidden;
         }
-        html { overflow-y: scroll; }
-        input[type="text"] { font-size: 16px !important; }
+
+        /* 메뉴 열림 상태에서 뒤쪽 배경 고정 */
+        body.menu-open { overflow: hidden; position: fixed; width: 100%; height: 100%; }
 
         .container { max-width: 500px; margin: 0 auto; min-height: 100vh; background-color: #fff; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.05); }
         
         .header {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 12px 20px; height: 57px; position: sticky; top: 0; z-index: 1000;
+            padding: 12px 20px; height: 57px; position: sticky; top: 0; z-index: 3000;
             background-color: #fff; border-bottom: 1px solid var(--border);
         }
         .logo { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 20px; font-weight: 700; color: #1e272e; cursor: pointer; white-space: nowrap; }
-        .icon-btn { background: none; border: none; cursor: pointer; color: #485460; font-size: 1.2rem; padding: 8px; position: relative; z-index: 1200; }
+        .icon-btn { background: none; border: none; cursor: pointer; color: #485460; font-size: 1.2rem; padding: 8px; position: relative; z-index: 3100; }
 
+        /* 새로운 창이 켜지는 느낌을 위해 완전 불투명 흰색 배경 및 전체 높이 설정 */
         .toc-menu {
             position: fixed; top: 57px; left: 50%; transform: translateX(-50%);
-            max-width: 500px; width: 100%; height: calc(100vh - 57px); z-index: 2000;
+            max-width: 500px; width: 100%; height: calc(100vh - 57px); z-index: 2500;
             overflow-y: auto; background-color: #fff; display: none;
+            padding-bottom: 100px; /* 기타 메뉴 잘림 방지용 하단 여백 */
         }
         .menu-group { border-bottom: 1px solid var(--border); padding: 5px 0; }
         .menu-parent-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; }
@@ -102,12 +105,12 @@
         }
         .card-bookmark-btn.active { color: var(--secondary); background: #fff; }
 
-        .modal { display: none; position: fixed; z-index: 3000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; }
+        .modal { display: none; position: fixed; z-index: 4000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; }
         .modal-content { max-width: 90%; max-height: 75%; border-radius: 15px; animation: zoomIn 0.3s; cursor: pointer; }
-        .modal-controls { position: absolute; top: 20px; width: 100%; padding: 0 20px; display: flex; justify-content: space-between; z-index: 3200; }
+        .modal-controls { position: absolute; top: 20px; width: 100%; padding: 0 20px; display: flex; justify-content: space-between; z-index: 4200; }
         .modal-icon-btn { background: rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.8); color: white; font-size: 1.5rem; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
         .modal-icon-btn.active { color: var(--secondary); border-color: var(--secondary); }
-        .modal-caption { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); color: white; background: rgba(0,0,0,0.6); padding: 10px 25px; border-radius: 30px; font-size: 0.9rem; z-index: 3200; white-space: nowrap; }
+        .modal-caption { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); color: white; background: rgba(0,0,0,0.6); padding: 10px 25px; border-radius: 30px; font-size: 0.9rem; z-index: 4200; white-space: nowrap; }
         
         @keyframes highlight-glow { 0% { transform: scale(1); } 50% { transform: scale(1.08); box-shadow: 0 0 20px var(--primary); border-color: var(--primary); } 100% { transform: scale(1); } }
         .highlight-card { animation: highlight-glow 0.8s ease-in-out 2; z-index: 10; position: relative; border: 2px solid var(--primary) !important; }
@@ -176,8 +179,9 @@
 </div>
 
 <script>
-    // [데이터 영역] pcData 배열을 여기에 넣으세요
+    // [데이터 영역] 사용자님의 pcData 리스트를 여기에 넣으세요
     const pcData = [
+
 { id: '1', name: 'The Chase 지우 Photobook Ver.', album: 'The Chase', category: '앨범 포카', version: 'Photobook Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/photobook%20vers..jpg', info: '더체이스, 핑크색 배경, 네일, 깐머리, 노란색 옷' },
        { id: '2', name: 'The Chase 지우 Minibook Ver.', album: 'The Chase', category: '앨범 포카', version: 'Minibook Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/minibookver.jpg', info: '더체이스, 브이, 깐머리' },
  { id: '3', name: 'The Chase 지우 Package Ver.', album: 'The Chase', category: '앨범 포카', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/package%20ver..jpg', info: '더체이스, 앞머리, 초록색 옷' },
@@ -494,6 +498,9 @@
 
 
 
+
+
+
 ];
 
     let bookmarks = JSON.parse(localStorage.getItem('jiwoo_bookmarks')) || [];
@@ -529,7 +536,7 @@
             return mAlb && mTab && mVer && mFs;
         });
 
-        // [정렬 로직] 세트 묶음 및 숫자 순서
+        // [정렬 로직 유지] 
         filtered.sort((a, b) => {
             const getAlbumPriority = (pc) => {
                 const name = pc.name.toUpperCase();
@@ -549,32 +556,34 @@
             const cB = catOrder[b.category] || 99;
             if (cA !== cB) return cA - cB;
 
-            // '폴라' 키워드를 제거한 클린 이름으로 비교 (세트 유지)
             const cleanA = a.name.replace(/폴라/g, '').replace(/\s+/g, ' ').trim();
             const cleanB = b.name.replace(/폴라/g, '').replace(/\s+/g, ' ').trim();
+            if (cleanA === cleanB) return a.name.includes('폴라') - b.name.includes('폴라');
 
-            if (cleanA === cleanB) {
-                // 이름과 숫자가 같으면 일반 포카가 먼저(0), 폴라가 뒤(1)
-                return a.name.includes('폴라') - b.name.includes('폴라');
-            }
-
-            // 한글-숫자-영어 순서
             const getType = (str) => {
                 if (/[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/.test(str[0])) return 1;
                 if (/[0-9]/.test(str[0])) return 2;
                 if (/[a-zA-Z]/.test(str[0])) return 3;
                 return 4;
             };
-
             const typeA = getType(cleanA);
             const typeB = getType(cleanB);
             if (typeA !== typeB) return typeA - typeB;
-
             return cleanA.localeCompare(cleanB, 'ko', { numeric: true });
         });
 
-        document.getElementById('display-album-name').innerText = keyword ? "검색 결과" : (currentAlbum || "전체 포카");
-        document.getElementById('tab-wrapper').style.display = keyword ? 'none' : 'flex';
+        // [검색 로직] 검색 시 레이아웃 처리
+        if (keyword !== '') {
+            document.getElementById('display-album-name').style.display = "none";
+            document.getElementById('tab-wrapper').style.display = "none";
+            document.getElementById('version-filter').style.display = "none";
+            document.getElementById('fansign-filter').style.display = "none";
+        } else {
+            document.getElementById('display-album-name').style.display = "block";
+            document.getElementById('display-album-name').innerText = currentAlbum || "전체 포카";
+            document.getElementById('tab-wrapper').style.display = "flex";
+        }
+
         document.getElementById('grid-slider-container').style.display = (keyword || currentAlbum !== '') ? 'flex' : 'none';
         document.getElementById('tab-label').innerText = `총 ${filtered.length}장`;
         pcList.innerHTML = filtered.map(pc => createCardHTML(pc)).join('');
@@ -591,11 +600,8 @@
 
     function handlePcClick(e, url, id) {
         const now = new Date().getTime();
-        if (now - lastTapTime < 300 && now - lastTapTime > 0) {
-            goToCard(id);
-        } else {
-            openModal(url, id);
-        }
+        if (now - lastTapTime < 300 && now - lastTapTime > 0) goToCard(id);
+        else openModal(url, id);
         lastTapTime = now;
     }
 
@@ -614,7 +620,7 @@
         document.getElementById('modal-img').src = url;
         document.getElementById('modal-pc-name').innerText = pc ? pc.name : "";
         document.getElementById('image-modal').style.display = "flex";
-        document.body.style.overflow = "hidden";
+        document.body.classList.add('menu-open');
         updateModalUI();
         document.getElementById('modal-bookmark-btn').onclick = (e) => { e.stopPropagation(); toggleBookmark(id); updateModalUI(); };
     }
@@ -629,20 +635,31 @@
     function closeModal(e) {
         if (e && e.stopPropagation) e.stopPropagation();
         document.getElementById('image-modal').style.display = "none";
-        document.body.style.overflow = "auto";
+        document.body.classList.remove('menu-open');
+    }
+
+    function resetSearch() {
+        searchInput.value = '';
+        document.getElementById('search-bar').style.display = 'none';
+    }
+
+    function closeMenu() {
+        document.getElementById('toc-menu').style.display = 'none';
+        document.body.classList.remove('menu-open');
     }
 
     function goToCard(id) {
         const pc = pcData.find(p => p.id === id);
         if (!pc) return;
         closeModal();
+        closeMenu();
+        resetSearch(); 
         currentAlbum = pc.album;
         currentTab = pc.category;
         currentVer = pc.version || '전체';
         currentFsType = pc.fsType || '전체';
         document.getElementById('welcome-view').style.display = 'none';
         document.getElementById('result-area').style.display = 'block';
-        searchInput.value = '';
         renderTabs(); 
         renderCards();
         setTimeout(() => {
@@ -667,19 +684,22 @@
         const fFilter = document.getElementById('fansign-filter');
         vFilter.style.display = 'none'; fFilter.style.display = 'none';
 
-        if (currentTab.includes('앨범') && (currentAlbum === 'The Chase' || currentAlbum === 'FOCUS')) {
-            vFilter.style.display = 'block';
-            let vers = ['전체'];
-            if (currentAlbum === 'The Chase') vers.push('Photobook Ver.', 'Package Ver.', 'Minibook Ver.');
-            else vers.push('Rule Book Ver.', 'PhotoBook Ver.', 'Heart Locket Ver.', 'SMini Ver.');
-            document.getElementById('version-btn-wrapper').innerHTML = vers.map(v => `<button class="f-btn ${v===currentVer?'active':''}" onclick="currentVer='${v}'; renderCards(); renderTabs();">${v}</button>`).join('');
-        } else if (currentTab.includes('팬싸') && ['The Chase', 'STYLE', 'FOCUS'].includes(currentAlbum)) {
-            fFilter.style.display = 'block';
-            document.getElementById('fansign-btn-wrapper').innerHTML = ['전체', '대면', '영통'].map(t => `<button class="f-btn ${t===currentFsType?'active':''}" onclick="currentFsType='${t}'; renderCards(); renderTabs();">${t}</button>`).join('');
+        if (searchInput.value.trim() === '') {
+            if (currentTab.includes('앨범') && (currentAlbum === 'The Chase' || currentAlbum === 'FOCUS')) {
+                vFilter.style.display = 'block';
+                let vers = ['전체'];
+                if (currentAlbum === 'The Chase') vers.push('Photobook Ver.', 'Package Ver.', 'Minibook Ver.');
+                else vers.push('Rule Book Ver.', 'PhotoBook Ver.', 'Heart Locket Ver.', 'SMini Ver.');
+                document.getElementById('version-btn-wrapper').innerHTML = vers.map(v => `<button class="f-btn ${v===currentVer?'active':''}" onclick="currentVer='${v}'; renderCards(); renderTabs();">${v}</button>`).join('');
+            } else if (currentTab.includes('팬싸') && ['The Chase', 'STYLE', 'FOCUS'].includes(currentAlbum)) {
+                fFilter.style.display = 'block';
+                document.getElementById('fansign-btn-wrapper').innerHTML = ['전체', '대면', '영통'].map(t => `<button class="f-btn ${t===currentFsType?'active':''}" onclick="currentFsType='${t}'; renderCards(); renderTabs();">${t}</button>`).join('');
+            }
         }
     }
 
     function changeTab(el, cat) {
+        resetSearch(); 
         currentTab = cat; currentVer = '전체'; currentFsType = '전체';
         renderTabs(); renderCards();
     }
@@ -700,15 +720,22 @@
         renderCards();
     });
 
+    // [검색 돋보기 동작 수정] 누르면 검색창 즉시 활성화
     document.getElementById('search-toggle').onclick = () => {
+        closeMenu(); 
         const bar = document.getElementById('search-bar');
-        bar.style.display = bar.style.display === 'block' ? 'none' : 'block';
-        if (bar.style.display === 'block') { searchInput.focus(); document.getElementById('welcome-view').style.display = 'none'; }
+        bar.style.display = 'block';
+        searchInput.focus(); 
+        document.getElementById('welcome-view').style.display = 'none';
+        document.getElementById('result-area').style.display = 'block';
+        renderCards();
     };
 
     function showBookmarks() {
+        resetSearch(); 
         document.getElementById('welcome-view').style.display = 'none';
         document.getElementById('result-area').style.display = 'block';
+        document.getElementById('display-album-name').style.display = "block";
         document.getElementById('display-album-name').innerText = "내 북마크";
         document.getElementById('tab-wrapper').innerHTML = "";
         const data = pcData.filter(pc => bookmarks.includes(pc.id));
@@ -721,10 +748,10 @@
         document.getElementById('menu-list-container').innerHTML = menuStructure.map((p, i) => `
             <div class="menu-group">
                 <div class="menu-parent-row">
-                    <span class="menu-parent-text" onclick="currentAlbum='${p.name}'; currentTab='전체'; currentVer='전체'; currentFsType='전체'; document.getElementById('toc-menu').style.display='none'; document.getElementById('welcome-view').style.display='none'; document.getElementById('result-area').style.display='block'; renderTabs(); renderCards();">${p.name}</span>
+                    <span class="menu-parent-text" onclick="closeMenu(); resetSearch(); currentAlbum='${p.name}'; currentTab='전체'; currentVer='전체'; currentFsType='전체'; document.getElementById('welcome-view').style.display='none'; document.getElementById('result-area').style.display='block'; renderTabs(); renderCards();">${p.name}</span>
                     ${p.children.length ? `<div class="toggle-btn" onclick="toggleSubMenu(this, ${i})"><i class="fas fa-chevron-down"></i></div>` : ''}
                 </div>
-                <ul class="menu-child-list" id="sub-${i}" style="display:none;">${p.children.map(c => `<li class="menu-child-item" onclick="currentAlbum='${p.name}'; currentTab='${c}'; currentVer='전체'; currentFsType='전체'; document.getElementById('toc-menu').style.display='none'; document.getElementById('welcome-view').style.display='none'; document.getElementById('result-area').style.display='block'; renderTabs(); renderCards();">${c}</li>`).join('')}</ul>
+                <ul class="menu-child-list" id="sub-${i}" style="display:none;">${p.children.map(c => `<li class="menu-child-item" onclick="closeMenu(); resetSearch(); currentAlbum='${p.name}'; currentTab='${c}'; currentVer='전체'; currentFsType='전체'; document.getElementById('welcome-view').style.display='none'; document.getElementById('result-area').style.display='block'; renderTabs(); renderCards();">${c}</li>`).join('')}</ul>
             </div>
         `).join('');
     }
@@ -737,7 +764,13 @@
 
     document.getElementById('menu-toggle').onclick = () => {
         const m = document.getElementById('toc-menu');
-        m.style.display = m.style.display === 'block' ? 'none' : 'block';
+        if (m.style.display === 'block') {
+            closeMenu();
+        } else {
+            resetSearch(); 
+            m.style.display = 'block';
+            document.body.classList.add('menu-open'); 
+        }
     };
 
     gridRange.addEventListener('input', (e) => {
