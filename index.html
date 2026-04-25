@@ -87,39 +87,50 @@
         .zoom-slider { -webkit-appearance: none; width: 80px; height: 4px; background: #dfe6e9; border-radius: 2px; outline: none; }
         .zoom-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; background: var(--primary); border-radius: 50%; cursor: pointer; }
 
-        .card-grid { display: grid; grid-template-columns: repeat(var(--grid-cols), 1fr); gap: 10px; margin-top: 10px; align-items: stretch; }
-        .card-item { background: #fff; border-radius: 12px; border: 1px solid var(--border); padding: 8px; display: flex; flex-direction: column; position: relative; box-shadow: var(--card-shadow); transition: transform 0.2s; }
-        .card-image-wrapper { width: 100%; aspect-ratio: 5.5 / 8.5; border-radius: 8px; overflow: hidden; background: #f1f2f6; }
+        .card-grid { display: grid; grid-template-columns: repeat(var(--grid-cols), 1fr); gap: 8px; margin-top: 10px; align-items: stretch; }
+        .card-item { background: #fff; border-radius: 10px; border: 1px solid var(--border); padding: 6px; display: flex; flex-direction: column; position: relative; box-shadow: var(--card-shadow); transition: transform 0.2s; }
+        
+        /* [유지] 이미지 비율 고정 */
+        .card-image-wrapper { width: 100%; aspect-ratio: 5.5 / 8.5; border-radius: 6px; overflow: hidden; background: #f1f2f6; }
         .card-image-wrapper img { width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
         
-        /* [수정] 카드 하단 이름 영역 높이 고정 및 텍스트 자동 조절 */
+        /* [수정] 기본 글씨 크기 및 여백 조정 (위아래 잘림 방지) */
         .card-name { 
-            font-size: 0.75rem; font-weight: 700; color: #2d3436; 
-            margin: 8px 0 2px; text-align: center; 
-            height: 3.2em; /* 높이 고정 */
-            line-height: 1.1; 
+            font-size: 0.7rem; font-weight: 700; color: #2d3436; 
+            margin: 6px 0 1px; text-align: center; 
+            height: 3em; line-height: 1.1; /* line-height 줄여서 여백 확보 */
             word-break: keep-all; 
-            display: -webkit-box;
-            -webkit-line-clamp: 3; /* 최대 3줄 */
-            -webkit-box-orient: vertical;
+            display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
             overflow: hidden;
             display: flex; align-items: center; justify-content: center;
         }
 
-        /* 3배열 이상일 때 글자 크기를 더 줄여서 비율 고정 */
-        .grid-3-plus .card-name { 
-            font-size: 0.6rem; 
-            height: 3.2em;
-            letter-spacing: -0.02em;
-        }
-
+        /* [수정] 4배열 시 북마크 크기 축소 */
         .card-bookmark-btn { 
-            position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.8); 
-            border: none; cursor: pointer; font-size: 1.1rem; color: #dfe6e9; 
-            z-index: 5; width: 32px; height: 32px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px);
+            position: absolute; top: 8px; right: 8px; 
+            background: rgba(255,255,255,0.8); border: none; cursor: pointer; 
+            color: #dfe6e9; z-index: 5; 
+            width: 26px; height: 26px; /* 크기 줄임 */
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+            backdrop-filter: blur(4px); font-size: 0.9rem; /* 아이콘 크기 줄임 */
         }
         .card-bookmark-btn.active { color: var(--secondary); background: #fff; }
+
+        /* [수정] 3배열 이상일 때 최적화 (글씨 더 작게, 북마크 더 작게) */
+        .grid-3-plus .card-item { padding: 4px; border-radius: 8px; }
+        .grid-3-plus .card-image-wrapper { border-radius: 4px; }
+        .grid-3-plus .card-name { 
+            font-size: 0.55rem; /* 글씨 크기 대폭 축소 */
+            height: 3em;
+            margin: 4px 0 1px;
+            letter-spacing: -0.03em; /* 자간 줄여서 꽉 차보이게 */
+            line-height: 1; /* 높이 꽉 차게 */
+        }
+        .grid-3-plus .card-bookmark-btn { 
+            top: 5px; right: 5px; 
+            width: 20px; height: 20px; /* 북마크 크기 대폭 축소 */
+            font-size: 0.7rem; /* 아이콘 크기 대폭 축소 */
+        }
 
         .modal { display: none; position: fixed; z-index: 4000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; }
         .modal-content { max-width: 90%; max-height: 75%; border-radius: 15px; animation: zoomIn 0.3s; cursor: pointer; }
@@ -196,6 +207,7 @@
 
 <script>
     const pcData = [
+
 { id: '1', name: 'The Chase 지우 Photobook Ver.', album: 'The Chase', category: '앨범 포카', version: 'Photobook Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/photobook%20vers..jpg', info: '더체이스, 핑크색 배경, 네일, 깐머리, 노란색 옷' },
        { id: '2', name: 'The Chase 지우 Minibook Ver.', album: 'The Chase', category: '앨범 포카', version: 'Minibook Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/minibookver.jpg', info: '더체이스, 브이, 깐머리' },
  { id: '3', name: 'The Chase 지우 Package Ver.', album: 'The Chase', category: '앨범 포카', version: 'Package Ver.', imgUrl: 'https://pub-83b4941b081f4b069a35ab1bb62f2b43.r2.dev/package%20ver..jpg', info: '더체이스, 앞머리, 초록색 옷' },
@@ -513,7 +525,6 @@
 
 
 
-
 ]; // [데이터 영역]
 
     let bookmarks = JSON.parse(localStorage.getItem('jiwoo_bookmarks')) || [];
@@ -549,7 +560,6 @@
             return mAlb && mTab && mVer && mFs;
         });
 
-        // 정렬 로직
         filtered.sort((a, b) => {
             const getAlbumPriority = (pc) => {
                 const name = pc.name.toUpperCase();
@@ -678,7 +688,8 @@
             const target = document.getElementById(`card-${id}`);
             if (target) {
                 const headerOffset = 70;
-                const offsetPosition = target.getBoundingClientRect().top + window.pageYOffset - headerOffset;
+                const elementPosition = target.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
                 window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
                 target.classList.add('highlight-card');
                 setTimeout(() => target.classList.remove('highlight-card'), 2000);
@@ -771,6 +782,11 @@
         const submenu = document.getElementById(`sub-${index}`);
         submenu.style.display = (submenu.style.display === 'flex') ? 'none' : 'flex';
         btn.classList.toggle('active');
+    }
+
+    function closeMenu() {
+        document.getElementById('toc-menu').style.display = 'none';
+        document.body.classList.remove('menu-open');
     }
 
     document.getElementById('menu-toggle').onclick = () => {
